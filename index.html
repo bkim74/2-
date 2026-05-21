@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6주 AI 업무 자동화 강의 | 코딩 몰라도 만드는 AI 에이전트</title>
+  <meta name="description" content="코딩 비전공자도 6주 만에 랜딩페이지와 AI 에이전트를 만들고 반복 업무를 자동화하는 실전 중심 강의입니다.">
+  <meta name="keywords" content="AI 자동화 강의, 바이브 코딩, AI 에이전트, 업무 자동화, 비전공자 코딩">
+  <meta property="og:title" content="코딩 몰라도 괜찮아요. 6주 만에 AI로 내 업무를 자동화합니다.">
+  <meta property="og:description" content="아이디어만 있던 사람이 실제 동작하는 랜딩페이지와 AI 에이전트를 만드는 사람이 됩니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <style>
+    :root {
+      --bg: #050711;
+      --bg-soft: #0a0f20;
+      --panel: rgba(255, 255, 255, 0.075);
+      --panel-strong: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f5f7ff;
+      --muted: #aeb8d4;
+      --subtle: #73809f;
+      --purple: #a855f7;
+      --blue: #38bdf8;
+      --cyan: #22d3ee;
+      --green: #34d399;
+      --pink: #fb7185;
+      --yellow: #facc15;
+      --shadow: 0 20px 80px rgba(0, 0, 0, 0.38);
+      --radius: 8px;
+      --max: 1120px;
+      --font: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 8%, rgba(168, 85, 247, 0.22), transparent 32rem),
+        radial-gradient(circle at 88% 18%, rgba(56, 189, 248, 0.2), transparent 28rem),
+        linear-gradient(180deg, #050711 0%, #07101e 48%, #050711 100%);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      word-break: keep-all;
+      overflow-x: hidden;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(34, 211, 238, 0.9);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 1rem;
+      top: -4rem;
+      z-index: 1000;
+      min-height: 48px;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius);
+      background: var(--text);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 7, 17, 0.76);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-wrap {
+      width: min(100% - 2rem, var(--max));
+      min-height: 72px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--purple), var(--blue), var(--green));
+      box-shadow: 0 0 34px rgba(56, 189, 248, 0.24);
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-links a {
+      min-height: 48px;
+      padding: 0.75rem 0.9rem;
+      color: var(--muted);
+      font-size: 0.94rem;
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius);
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .menu-toggle {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+    }
+
+    .mobile-panel {
+      display: none;
+      width: min(100% - 2rem, var(--max));
+      margin: 0 auto 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(10, 15, 32, 0.95);
+      box-shadow: var(--shadow);
+      padding: 0.5rem;
+    }
+
+    .mobile-panel.is-open {
+      display: grid;
+    }
+
+    .mobile-panel a {
+      min-height: 48px;
+      padding: 0.8rem 0.9rem;
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+
+    .mobile-panel a:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+    }
+
+    .btn {
+      min-height: 48px;
+      border: 0;
+      border-radius: var(--radius);
+      padding: 0.8rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-weight: 800;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 18px 50px rgba(56, 189, 248, 0.15);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6 0%, #2563eb 48%, #0891b2 100%);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.26);
+    }
+
+    .btn-compact {
+      display: none;
+      padding-inline: 0.95rem;
+      font-size: 0.94rem;
+    }
+
+    .glow-pulse {
+      position: relative;
+      isolation: isolate;
+      animation: pulseGlow 2.6s ease-in-out infinite;
+    }
+
+    .glow-pulse::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      z-index: -1;
+      border-radius: calc(var(--radius) + 5px);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.65), rgba(34, 211, 238, 0.6));
+      filter: blur(18px);
+      opacity: 0.55;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 14px 46px rgba(99, 102, 241, 0.28); }
+      50% { box-shadow: 0 18px 68px rgba(34, 211, 238, 0.35); }
+    }
+
+    main {
+      position: relative;
+    }
+
+    section {
+      padding: 5rem 0;
+      scroll-margin-top: 92px;
+    }
+
+    .container {
+      width: min(100% - 2rem, var(--max));
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: calc(100vh - 72px);
+      padding: 5.2rem 0 3.5rem;
+      display: grid;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% 0 -10%;
+      height: 11rem;
+      background: linear-gradient(180deg, transparent, rgba(5, 7, 17, 0.92));
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      gap: 2rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      width: fit-content;
+      min-height: 34px;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid rgba(34, 211, 238, 0.26);
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.08);
+      color: #cbf6ff;
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .hero h1 {
+      max-width: 780px;
+      margin: 1.15rem 0 1rem;
+      font-size: clamp(2.35rem, 8vw, 5.8rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .gradient-text {
+      color: transparent;
+      background: linear-gradient(135deg, #ffffff 0%, #a7f3ff 28%, #c084fc 66%, #f0abfc 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-copy {
+      max-width: 700px;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2.8vw, 1.35rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin: 2rem 0 1.5rem;
+    }
+
+    .keyword-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .keyword-list li,
+    .badge {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 0.42rem 0.7rem;
+      color: #d7def4;
+      background: rgba(255, 255, 255, 0.07);
+      font-size: 0.88rem;
+      font-weight: 750;
+    }
+
+    .hero-visual {
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04)),
+        rgba(255, 255, 255, 0.05);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      padding: 1rem;
+      min-height: 420px;
+      display: grid;
+      align-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual::before {
+      content: "";
+      position: absolute;
+      inset: -35% -30% auto auto;
+      width: 20rem;
+      height: 20rem;
+      background: conic-gradient(from 120deg, rgba(168, 85, 247, 0.28), rgba(34, 211, 238, 0.34), rgba(52, 211, 153, 0.24), rgba(168, 85, 247, 0.28));
+      filter: blur(22px);
+      border-radius: 50%;
+    }
+
+    .workflow-card,
+    .metric-card,
+    .glass-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 16px 52px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(18px);
+    }
+
+    .workflow-card {
+      padding: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .window-dots span {
+      width: 0.72rem;
+      height: 0.72rem;
+      border-radius: 999px;
+      background: var(--pink);
+    }
+
+    .window-dots span:nth-child(2) {
+      background: var(--yellow);
+    }
+
+    .window-dots span:nth-child(3) {
+      background: var(--green);
+    }
+
+    .code-lines {
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .code-line {
+      min-height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04));
+    }
+
+    .code-line:nth-child(1) { width: 86%; }
+    .code-line:nth-child(2) { width: 68%; background: linear-gradient(90deg, rgba(34, 211, 238, 0.5), rgba(255, 255, 255, 0.04)); }
+    .code-line:nth-child(3) { width: 78%; }
+    .code-line:nth-child(4) { width: 52%; background: linear-gradient(90deg, rgba(168, 85, 247, 0.5), rgba(255, 255, 255, 0.04)); }
+
+    .agent-flow {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-height: 56px;
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      background: rgba(5, 7, 17, 0.55);
+      color: var(--muted);
+    }
+
+    .flow-step strong {
+      color: var(--text);
+      display: block;
+      line-height: 1.2;
+    }
+
+    .icon {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(34, 211, 238, 0.8));
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-card {
+      padding: 1rem;
+    }
+
+    .metric-card strong {
+      display: block;
+      font-size: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .metric-card span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 2rem;
+    }
+
+    .section-kicker {
+      margin: 0 0 0.6rem;
+      color: var(--cyan);
+      font-weight: 850;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(2rem, 5.6vw, 3.4rem);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .section-desc {
+      margin: 1rem 0 0;
+      color: var(--muted);
+      font-size: 1.04rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .cards-3,
+    .cards-4 {
+      grid-template-columns: 1fr;
+    }
+
+    .glass-card {
+      padding: 1.15rem;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(34, 211, 238, 0.32);
+      background: var(--panel-strong);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+    }
+
+    .glass-card h3 {
+      margin: 0.9rem 0 0.5rem;
+      font-size: 1.12rem;
+      line-height: 1.35;
+    }
+
+    .glass-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .result-card strong {
+      display: block;
+      margin-top: 0.85rem;
+      font-size: 1.08rem;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 0.85rem;
+      position: relative;
+    }
+
+    .timeline-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .timeline-trigger,
+    .faq-trigger {
+      width: 100%;
+      min-height: 64px;
+      border: 0;
+      color: var(--text);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      text-align: left;
+      padding: 1rem;
+    }
+
+    .week-title {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .week-badge {
+      min-width: 50px;
+      height: 36px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(56, 189, 248, 0.75));
+      color: white;
+    }
+
+    .timeline-trigger strong,
+    .faq-trigger strong {
+      font-size: 1.02rem;
+      line-height: 1.35;
+    }
+
+    .chevron {
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+      transition: transform 0.2s ease;
+    }
+
+    .timeline-trigger[aria-expanded="true"] .chevron,
+    .faq-trigger[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .accordion-panel {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.25s ease;
+    }
+
+    .timeline-trigger[aria-expanded="true"] + .accordion-panel,
+    .faq-trigger[aria-expanded="true"] + .accordion-panel {
+      grid-template-rows: 1fr;
+    }
+
+    .accordion-inner {
+      overflow: hidden;
+    }
+
+    .accordion-content {
+      padding: 0 1rem 1rem 1rem;
+      color: var(--muted);
+    }
+
+    .accordion-content ul {
+      margin: 0.75rem 0 0;
+      padding-left: 1.1rem;
+    }
+
+    .feature-strip {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .instructor {
+      display: grid;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.85), rgba(34, 211, 238, 0.75), rgba(52, 211, 153, 0.62));
+      color: white;
+      box-shadow: 0 18px 60px rgba(34, 211, 238, 0.18);
+    }
+
+    .review-wrap {
+      margin-top: 2rem;
+    }
+
+    .review-card p {
+      font-size: 1.02rem;
+    }
+
+    .review-card footer {
+      margin-top: 1rem;
+      color: var(--subtle);
+      font-weight: 750;
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .final-cta {
+      padding-bottom: 5.5rem;
+    }
+
+    .cta-panel {
+      position: relative;
+      overflow: hidden;
+      padding: 1.35rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(34, 211, 238, 0.1), rgba(52, 211, 153, 0.12)),
+        rgba(255, 255, 255, 0.07);
+      box-shadow: var(--shadow);
+    }
+
+    .cta-panel::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.13), transparent);
+      transform: translateX(-100%);
+      animation: sheen 6s linear infinite;
+    }
+
+    @keyframes sheen {
+      0% { transform: translateX(-100%); }
+      38%, 100% { transform: translateX(100%); }
+    }
+
+    .cta-panel > * {
+      position: relative;
+    }
+
+    .cta-panel h2 {
+      margin-top: 0.8rem;
+    }
+
+    .cta-panel p {
+      color: var(--muted);
+      max-width: 680px;
+    }
+
+    .site-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      padding: 2rem 0;
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--muted);
+    }
+
+    .footer-grid {
+      width: min(100% - 2rem, var(--max));
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .footer-links a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      color: #d7def4;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-backdrop.is-open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(100%, 560px);
+      max-height: calc(100vh - 2rem);
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #0a0f20;
+      box-shadow: var(--shadow);
+      padding: 1rem;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-head h2 {
+      font-size: 1.5rem;
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.35rem;
+      color: #d7def4;
+      font-weight: 750;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      padding: 0.75rem 0.85rem;
+    }
+
+    select option {
+      color: #101322;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .form-note {
+      margin: 0.75rem 0 0;
+      color: var(--subtle);
+      font-size: 0.9rem;
+    }
+
+    svg {
+      display: block;
+    }
+
+    @media (min-width: 640px) {
+      .btn-compact {
+        display: inline-flex;
+      }
+
+      .cards-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .cards-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .feature-strip,
+      .instructor,
+      .footer-grid {
+        grid-template-columns: 0.85fr 1.15fr;
+      }
+
+      .cta-panel {
+        padding: 2rem;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .nav-links {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: none;
+      }
+
+      .mobile-panel {
+        display: none !important;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1.08fr 0.92fr;
+      }
+
+      .cards-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .feature-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .instructor {
+        grid-template-columns: 180px 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 바로가기</a>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="logo" href="#hero" aria-label="AI 자동화 클래스 홈">
+        <span class="logo-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>AI 자동화 클래스</span>
+      </a>
+
+      <nav class="nav-links" aria-label="주요 메뉴">
+        <a href="#intro">강의소개</a>
+        <a href="#curriculum">커리큘럼</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary btn-compact js-open-modal" type="button">수강신청</button>
+        <button class="menu-toggle" type="button" aria-label="모바일 메뉴 열기" aria-controls="mobile-menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-panel" id="mobile-menu" aria-label="모바일 메뉴">
+      <a href="#intro">강의소개</a>
+      <a href="#curriculum">커리큘럼</a>
+      <a href="#faq">FAQ</a>
+      <a href="#final-cta">수강신청</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="reveal">
+          <span class="eyebrow">마감 임박 · 조기 신청 혜택 [할인혜택]</span>
+          <h1 id="hero-title">코딩 몰라도 괜찮아요. <span class="gradient-text">6주 만에 AI로 내 업무를 자동화합니다.</span></h1>
+          <p class="hero-copy">아이디어만 있던 사람이 실제 동작하는 랜딩페이지와 AI 에이전트, 즉 내 대신 일해주는 AI 비서를 만드는 사람이 됩니다.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary glow-pulse js-open-modal" type="button">지금 수강 신청하기</button>
+            <a class="btn" href="#curriculum">커리큘럼 보기</a>
+          </div>
+          <ul class="keyword-list" aria-label="강의 키워드">
+            <li>비전공자 가능</li>
+            <li>바이브 코딩</li>
+            <li>AI 에이전트</li>
+            <li>업무 자동화</li>
+            <li>최종 프로젝트</li>
+          </ul>
+        </div>
+
+        <div class="hero-visual reveal" aria-label="AI 업무 자동화 결과물 미리보기">
+          <div class="workflow-card">
+            <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="code-lines" aria-hidden="true">
+              <span class="code-line"></span>
+              <span class="code-line"></span>
+              <span class="code-line"></span>
+              <span class="code-line"></span>
+            </div>
+            <div class="agent-flow">
+              <div class="flow-step">
+                <span class="icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span><strong>반복 업무 입력</strong>엑셀 정리, 메일 초안, 자료 요약</span>
+              </div>
+              <div class="flow-step">
+                <span class="icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </span>
+                <span><strong>AI 에이전트 실행</strong>내 규칙대로 판단하고 대신 처리</span>
+              </div>
+              <div class="flow-step">
+                <span class="icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span><strong>결과물 완성</strong>랜딩페이지와 자동화 프로젝트 보유</span>
+              </div>
+            </div>
+          </div>
+          <div class="metrics" aria-label="신뢰 지표">
+            <div class="metric-card"><strong>[N]명</strong><span>누적 수강생</span></div>
+            <div class="metric-card"><strong>[N]%</strong><span>수강 만족도</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="intro" class="reveal">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">공감에서 시작합니다</p>
+          <h2>이런 고민 있으셨나요?</h2>
+          <p class="section-desc">코딩을 잘하는 사람이 되는 수업이 아닙니다. 매일 쌓이는 일을 AI와 함께 처리하는 방법을 몸에 익히는 수업입니다.</p>
+        </div>
+        <div class="grid cards-4">
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M8 7h8M8 12h8M8 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 3h14v18H5z" stroke="currentColor" stroke-width="1.8" rx="2"/></svg></span>
+            <h3>매일 반복되는 업무에 지치셨나요?</h3>
+            <p>복사, 정리, 요약, 답변 작성처럼 시간이 새는 업무를 자동화 대상으로 바꿉니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h3>코딩 공부 시작했다가 포기하셨나요?</h3>
+            <p>문법 암기보다 AI에게 원하는 결과를 정확히 맡기는 실전 흐름부터 익힙니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.4 7.5-8 8-4.6-.5-8-3-8-8V7l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h3>AI 도구가 많아 더 막막하신가요?</h3>
+            <p>무엇을 써야 하는지보다 어떤 상황에 어떻게 조합하는지가 먼저입니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h16M8 16v-5M12 16V8M16 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <h3>아이디어가 결과물로 이어지지 않나요?</h3>
+            <p>6주 동안 내 손으로 보여줄 수 있는 웹페이지와 자동화 프로젝트를 완성합니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" aria-labelledby="audience-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">수강 대상</p>
+          <h2 id="audience-title">이런 분께 딱 맞습니다</h2>
+        </div>
+        <div class="grid cards-4">
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V8l6-4 6 4v12M9 20v-6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h3>비전공 직장인</h3>
+            <p>업무 흐름은 알지만 개발이 낯선 분도 결과 중심으로 따라올 수 있습니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 4h14v5H5zM5 13h6v7H5zM15 13h4v7h-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+            <h3>기획자·디자이너</h3>
+            <p>머릿속 서비스 아이디어를 실제 클릭 가능한 랜딩페이지로 구현합니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 14c4-8 12-8 16 0M6 18h12M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <h3>1인 창업가</h3>
+            <p>외주 전 단계에서 빠르게 테스트할 페이지와 자동화 도구를 직접 만듭니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h3>반복 업무가 많은 사람</h3>
+            <p>자주 하는 일을 AI 에이전트에게 넘기는 기준과 제작 방식을 배웁니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" aria-labelledby="outcomes-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">수강 후 기대효과</p>
+          <h2 id="outcomes-title">6주 후 달라지는 것</h2>
+          <p class="section-desc">수업이 끝나면 지식만 남는 것이 아니라 바로 보여주고 다시 활용할 수 있는 결과물이 남습니다.</p>
+        </div>
+        <div class="grid cards-4">
+          <article class="glass-card result-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v12H4zM8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <strong>실제 동작하는 웹페이지 제작</strong>
+            <p>코딩 지식이 부족해도 AI 도구를 활용해 랜딩페이지를 완성합니다.</p>
+          </article>
+          <article class="glass-card result-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 8h10v8H7zM9 4v4M15 4v4M9 16v4M15 16v4M4 10h3M4 14h3M17 10h3M17 14h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <strong>나만의 AI 에이전트 보유</strong>
+            <p>내 대신 일해주는 AI 비서가 반복 업무를 처리하는 구조를 만듭니다.</p>
+          </article>
+          <article class="glass-card result-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 19h14M7 17l4-10 3 6 2-4 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <strong>자동화 미니 프로젝트 완성</strong>
+            <p>내 업무에 맞춘 최종 프로젝트를 1개 이상 포트폴리오처럼 남깁니다.</p>
+          </article>
+          <article class="glass-card result-card">
+            <span class="icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 12h10M10 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            <strong>AI 툴 선택·조합 능력</strong>
+            <p>상황에 맞게 도구를 고르고 연결해 업무 생산성을 끌어올립니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="curriculum" class="reveal">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">커리큘럼</p>
+          <h2>주차별 인터랙티브 타임라인</h2>
+          <p class="section-desc">처음에는 AI에게 일을 맡기는 감각을 만들고, 후반에는 실제 업무 자동화 프로젝트로 연결합니다.</p>
+        </div>
+        <div class="timeline">
+          <article class="timeline-item">
+            <button class="timeline-trigger" type="button" aria-expanded="true">
+              <span class="week-title"><span class="week-badge">1주</span><strong>바이브 코딩 핵심 원리와 실습</strong></span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel">
+              <div class="accordion-inner"><div class="accordion-content">코드를 외우기보다 AI에게 원하는 결과를 설명하고, 수정하고, 완성하는 기본 루틴을 익힙니다.</div></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <button class="timeline-trigger" type="button" aria-expanded="false">
+              <span class="week-title"><span class="week-badge">2주</span><strong>Claude Code로 AI 작업 시작하기</strong></span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel">
+              <div class="accordion-inner"><div class="accordion-content">Claude Code를 작업 파트너처럼 사용하는 법을 배우고, 요청서 작성부터 결과 검토까지 한 흐름으로 실습합니다.</div></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <button class="timeline-trigger" type="button" aria-expanded="false">
+              <span class="week-title"><span class="week-badge">3주</span><strong>직접 만드는 강의 홍보 랜딩페이지</strong></span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel">
+              <div class="accordion-inner"><div class="accordion-content">카피, 섹션 구조, CTA, 반응형 화면을 갖춘 실제 서비스 수준의 랜딩페이지를 완성합니다.</div></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <button class="timeline-trigger" type="button" aria-expanded="false">
+              <span class="week-title"><span class="week-badge">4주</span><strong>나만의 AI 에이전트 만들기</strong></span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel">
+              <div class="accordion-inner"><div class="accordion-content">AI 에이전트는 내 대신 일해주는 AI 비서입니다. 업무 규칙을 정리하고 실행 가능한 자동화 흐름으로 만듭니다.</div></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <button class="timeline-trigger" type="button" aria-expanded="false">
+              <span class="week-title"><span class="week-badge">5주</span><strong>자동화 확장 도구 실전 활용법</strong></span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel">
+              <div class="accordion-inner"><div class="accordion-content">반복 작업을 더 넓게 연결하고 실행하는 방법을 배웁니다. 필요할 때 OpenClaw와 헤르메스 같은 도구를 활용해 자동화 범위를 확장합니다.</div></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <button class="timeline-trigger" type="button" aria-expanded="false">
+              <span class="week-title"><span class="week-badge">6주</span><strong>실무를 자동화하는 최종 프로젝트</strong></span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel">
+              <div class="accordion-inner"><div class="accordion-content">내 업무 하나를 골라 자동화 프로젝트로 완성합니다. 결과물은 이후 업무에 계속 수정하며 활용할 수 있습니다.</div></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">강의 특징</p>
+          <h2 id="features-title">배우는 순간부터 업무에 연결됩니다</h2>
+        </div>
+        <div class="feature-strip">
+          <article class="glass-card">
+            <span class="badge">실습 중심</span>
+            <h3>듣고 끝나는 강의가 아닙니다</h3>
+            <p>매주 직접 만들고 고치며 AI와 일하는 감각을 손에 익힙니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="badge">결과물 중심</span>
+            <h3>보여줄 수 있는 산출물이 남습니다</h3>
+            <p>랜딩페이지, AI 에이전트, 자동화 프로젝트를 단계적으로 완성합니다.</p>
+          </article>
+          <article class="glass-card">
+            <span class="badge">자동화 중심</span>
+            <h3>내 업무를 줄이는 데 집중합니다</h3>
+            <p>멋진 데모보다 실제 반복 업무를 줄이는 흐름을 우선합니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" aria-labelledby="instructor-title">
+      <div class="container">
+        <div class="instructor glass-card">
+          <div class="avatar" aria-hidden="true">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="section-kicker">강사 소개</p>
+            <h2 id="instructor-title">[강사명]</h2>
+            <p class="section-desc">비전공자도 AI 도구로 실제 결과물을 만들 수 있도록 복잡한 개념을 업무 언어로 풀어 안내합니다. 강의에서는 이론보다 실습, 기능보다 결과, 유행보다 내 업무에 바로 쓰는 자동화에 집중합니다.</p>
+          </div>
+        </div>
+
+        <div class="review-wrap">
+          <div class="section-head">
+            <p class="section-kicker">수강 후기</p>
+            <h2>먼저 경험한 사람들의 변화</h2>
+          </div>
+          <div class="grid cards-3">
+            <article class="glass-card review-card">
+              <p>"코딩은 늘 포기했는데, 이번에는 AI에게 맡기는 순서를 배워서 제 업무용 페이지를 완성했습니다."</p>
+              <footer>기획자 · [수강생명]</footer>
+            </article>
+            <article class="glass-card review-card">
+              <p>"매주 결과물이 남아서 좋았습니다. 특히 메일 초안과 자료 요약 자동화는 바로 쓰고 있습니다."</p>
+              <footer>마케터 · [수강생명]</footer>
+            </article>
+            <article class="glass-card review-card">
+              <p>"도구 이름보다 무엇을 자동화할지부터 잡아줘서 막막함이 줄었습니다. 혼자서도 개선할 수 있게 됐습니다."</p>
+              <footer>1인 창업가 · [수강생명]</footer>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="reveal">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">FAQ</p>
+          <h2>자주 묻는 질문</h2>
+        </div>
+        <div class="faq-list">
+          <article class="timeline-item">
+            <button class="faq-trigger" type="button" aria-expanded="true">
+              <strong>정말 코딩을 몰라도 들을 수 있나요?</strong>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel"><div class="accordion-inner"><div class="accordion-content">네. 코드를 처음부터 외우는 방식이 아니라 AI에게 요청하고 결과를 수정하는 방식으로 진행합니다. 컴퓨터 기본 사용이 가능하면 시작할 수 있습니다.</div></div></div>
+          </article>
+          <article class="timeline-item">
+            <button class="faq-trigger" type="button" aria-expanded="false">
+              <strong>준비물이 있나요?</strong>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel"><div class="accordion-inner"><div class="accordion-content">개인 노트북과 안정적인 인터넷 환경이 필요합니다. 필요한 AI 도구 계정과 설치 과정은 강의 초반에 안내합니다.</div></div></div>
+          </article>
+          <article class="timeline-item">
+            <button class="faq-trigger" type="button" aria-expanded="false">
+              <strong>수강 기간과 일정은 어떻게 되나요?</strong>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel"><div class="accordion-inner"><div class="accordion-content">총 6주 과정이며 세부 모집일정은 [모집일정]에 맞춰 안내됩니다.</div></div></div>
+          </article>
+          <article class="timeline-item">
+            <button class="faq-trigger" type="button" aria-expanded="false">
+              <strong>수강료와 조기 신청 혜택은 무엇인가요?</strong>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel"><div class="accordion-inner"><div class="accordion-content">수강료는 [수강료]이며, 조기 신청 시 [할인혜택]이 제공됩니다. 세부 혜택은 신청 페이지에서 확인할 수 있습니다.</div></div></div>
+          </article>
+          <article class="timeline-item">
+            <button class="faq-trigger" type="button" aria-expanded="false">
+              <strong>환불 규정은 어떻게 되나요?</strong>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-panel"><div class="accordion-inner"><div class="accordion-content">환불 규정은 [환불정책] 기준으로 적용됩니다. 결제 전 상세 안내를 확인하실 수 있습니다.</div></div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="final-cta" class="final-cta reveal">
+      <div class="container">
+        <div class="cta-panel">
+          <span class="eyebrow">마감 임박 · [모집일정]까지</span>
+          <h2>지금 신청하고 [할인혜택] 받기</h2>
+          <p>6주 후, 내 손으로 만든 AI 에이전트가 내 업무를 대신합니다. 반복 업무에 쓰던 시간을 기획, 창업, 성장에 다시 쓰세요.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary glow-pulse js-open-modal" type="button">지금 수강 신청하기</button>
+            <span class="badge">수강생 [N]명 · 만족도 [N]%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="#hero">
+          <span class="logo-mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </span>
+          <span>AI 자동화 클래스</span>
+        </a>
+        <p>코딩 몰라도 만드는 실무형 AI 자동화 강의</p>
+      </div>
+      <div class="footer-links" aria-label="연락처 및 SNS">
+        <a href="mailto:[이메일]">[이메일]</a>
+        <a href="#" aria-label="카카오채널 placeholder">카카오채널 [채널명]</a>
+        <a href="#" aria-label="SNS placeholder">SNS [링크]</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="apply-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <p class="section-kicker">수강 신청</p>
+          <h2 id="modal-title">6주 AI 업무 자동화 클래스</h2>
+        </div>
+        <button class="icon-btn js-close-modal" type="button" aria-label="신청 모달 닫기">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <form class="form-grid" id="apply-form">
+        <label>
+          이름
+          <input type="text" name="name" placeholder="[이름]" autocomplete="name" required>
+        </label>
+        <label>
+          이메일
+          <input type="email" name="email" placeholder="[이메일]" autocomplete="email" required>
+        </label>
+        <label>
+          현재 가장 자동화하고 싶은 업무
+          <select name="goal" required>
+            <option value="">선택해주세요</option>
+            <option>자료 조사·요약</option>
+            <option>메일·문서 작성</option>
+            <option>랜딩페이지 제작</option>
+            <option>반복 업무 자동화</option>
+            <option>아직 모르겠어요</option>
+          </select>
+        </label>
+        <label>
+          남기실 말
+          <textarea name="message" placeholder="예: 코딩 경험은 없지만 업무 자동화를 꼭 해보고 싶어요."></textarea>
+        </label>
+        <button class="btn btn-primary" type="submit">신청 정보 보내기</button>
+        <p class="form-note">실제 접수 연동 전 단계의 데모 폼입니다. 제출 시 화면에서 접수 메시지만 표시됩니다.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mobileMenu = document.querySelector('#mobile-menu');
+    const modal = document.querySelector('#apply-modal');
+    const openModalButtons = document.querySelectorAll('.js-open-modal');
+    const closeModalButton = document.querySelector('.js-close-modal');
+    const applyForm = document.querySelector('#apply-form');
+    let lastFocusedElement = null;
+
+    function setMenu(open) {
+      mobileMenu.classList.toggle('is-open', open);
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? '모바일 메뉴 닫기' : '모바일 메뉴 열기');
+    }
+
+    menuToggle.addEventListener('click', () => {
+      setMenu(!mobileMenu.classList.contains('is-open'));
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const targetId = link.getAttribute('href');
+        const target = document.querySelector(targetId);
+        if (!target) return;
+        event.preventDefault();
+        setMenu(false);
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+
+    document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+
+    function toggleAccordion(button) {
+      const isOpen = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!isOpen));
+    }
+
+    document.querySelectorAll('.timeline-trigger, .faq-trigger').forEach((button) => {
+      button.addEventListener('click', () => toggleAccordion(button));
+    });
+
+    function openModal() {
+      lastFocusedElement = document.activeElement;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      const firstInput = modal.querySelector('input, select, textarea, button');
+      if (firstInput) firstInput.focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      if (lastFocusedElement) lastFocusedElement.focus();
+    }
+
+    openModalButtons.forEach((button) => button.addEventListener('click', openModal));
+    closeModalButton.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      if (event.key !== 'Tab' || !modal.classList.contains('is-open')) return;
+
+      const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    applyForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const submitButton = applyForm.querySelector('button[type="submit"]');
+      submitButton.textContent = '신청 정보가 접수되었습니다';
+      submitButton.disabled = true;
+      setTimeout(() => {
+        submitButton.textContent = '신청 정보 보내기';
+        submitButton.disabled = false;
+        applyForm.reset();
+        closeModal();
+      }, 1600);
+    });
+  </script>
+</body>
+</html>
