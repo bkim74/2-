@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>온순간 아침 창</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #eef0ec;
+    --surface: #fbfbf8;
+    --surface-2: #f4f5f1;
+    --ink: #1c2330;
+    --ink-2: #3b4454;
+    --muted: #697385;
+    --line: #d9ddd6;
+    --amber: #c8741f;
+    --amber-soft: rgba(214, 131, 46, 0.14);
+    --life: #2f7565;
+    --build: #3456a0;
+    --content: #b04c3a;
+    --claude: #b8662a;
+    --rest: #66738a;
+    --done: #2f7565;
+    --now: #c8741f;
+    --shadow: 0 1px 2px rgba(28, 35, 48, 0.06), 0 8px 28px rgba(28, 35, 48, 0.06);
+    --serif: "Hahmlet", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+    --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #0f131a;
+      --surface: #171c25;
+      --surface-2: #1d2330;
+      --ink: #e8eaee;
+      --ink-2: #c5cad4;
+      --muted: #8f98a8;
+      --line: #2b3240;
+      --amber: #f0a24f;
+      --amber-soft: rgba(240, 162, 79, 0.14);
+      --life: #6cc0a8;
+      --build: #8aa6ea;
+      --content: #e98a74;
+      --claude: #f0a24f;
+      --rest: #9aa6bb;
+      --done: #6cc0a8;
+      --now: #f0a24f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #0f131a;
+    --surface: #171c25;
+    --surface-2: #1d2330;
+    --ink: #e8eaee;
+    --ink-2: #c5cad4;
+    --muted: #8f98a8;
+    --line: #2b3240;
+    --amber: #f0a24f;
+    --amber-soft: rgba(240, 162, 79, 0.14);
+    --life: #6cc0a8;
+    --build: #8aa6ea;
+    --content: #e98a74;
+    --claude: #f0a24f;
+    --rest: #9aa6bb;
+    --done: #6cc0a8;
+    --now: #f0a24f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    padding-inline: 16px;
+    padding-block: 20px 64px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  .label { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ---------- sky hero ---------- */
+  .sky {
+    position: relative; overflow: hidden;
+    border-radius: 20px; border: 1px solid var(--line);
+    background: var(--sky, linear-gradient(180deg, rgba(122, 132, 196, 0.22), rgba(236, 160, 96, 0.26))), var(--surface);
+    padding: 26px 26px 10px;
+    display: grid; gap: 14px;
+  }
+  .sky-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+  .date { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+  .theme-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 12.5px; color: var(--ink-2); }
+  .greeting { font-size: 16px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+  .one-line {
+    font-family: var(--serif); font-weight: 500; font-size: clamp(28px, 4.6vw, 48px); line-height: 1.3;
+    letter-spacing: -0.01em; max-width: 22ch;
+  }
+  .one-line::before { content: "“"; color: var(--amber); margin-right: 2px; }
+  .one-line::after { content: "”"; color: var(--amber); margin-left: 2px; }
+  .horizon { width: 100%; height: auto; display: block; margin-top: 4px; }
+  .horizon text { font-family: var(--mono); font-size: 13px; fill: var(--muted); }
+  .sky-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); padding-bottom: 10px; }
+  .sky-meta b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- 3-line card ---------- */
+  .card-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; }
+  .three { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; display: grid; gap: 4px; }
+  .three-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .three-head h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; }
+  .line3 { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 14px 0; border-top: 1px dashed var(--line); align-items: start; }
+  .line3:first-of-type { border-top: 0; }
+  .line3 .k { font-family: var(--serif); font-weight: 700; font-size: 15px; padding-top: 2px; }
+  .line3[data-k="reality"] .k { color: var(--rest); }
+  .line3[data-k="wish"] .k { color: var(--life); }
+  .line3[data-k="choice"] .k { color: var(--amber); }
+  .line3 .v { font-size: 17px; line-height: 1.65; border-radius: 6px; padding: 2px 6px; margin: -2px -6px; }
+  .line3 .v:hover { background: var(--surface-2); }
+  .line3 .v:focus { background: var(--surface-2); outline: 1px solid var(--line); }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
+  .return-q { display: grid; gap: 12px; align-content: start; }
+  .return-q blockquote { margin: 0; font-family: var(--serif); font-size: 19px; line-height: 1.6; }
+  .focus-list { display: grid; gap: 10px; margin: 0; }
+  .focus-list div { display: grid; gap: 2px; }
+  .focus-list dt { font-size: 12.5px; color: var(--muted); }
+  .focus-list dd { margin: 0; font-weight: 500; }
+
+  /* ---------- day + side ---------- */
+  .grid-2 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+  .section-head h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; }
+  .plan { list-style: none; margin: 0; padding: 0; display: grid; }
+  .plan li { display: grid; grid-template-columns: 92px 18px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); align-items: start; }
+  .plan li:first-child { border-top: 0; }
+  .plan .t { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
+  .plan input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--amber); }
+  .plan .ttl { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .plan .det { color: var(--ink-2); font-size: 14.5px; margin-top: 2px; }
+  .plan li.is-now { background: var(--amber-soft); border-radius: 10px; padding-inline: 10px; margin-inline: -10px; border-top-color: transparent; }
+  .plan li.is-now + li { border-top-color: transparent; }
+  .plan li.checked .ttl span:first-child, .plan li.checked .det { text-decoration: line-through; text-decoration-color: var(--muted); color: var(--muted); }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; font-weight: 500; white-space: nowrap; }
+  .tag-life { color: var(--life); } .tag-build { color: var(--build); } .tag-content { color: var(--content); } .tag-claude { color: var(--claude); } .tag-rest { color: var(--rest); }
+  .side { display: grid; gap: 20px; }
+  .gates { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
+  .gates li { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 9px 0; position: relative; }
+  .gates li::before { content: ""; position: absolute; left: 7px; top: 24px; bottom: -10px; width: 2px; background: var(--line); }
+  .gates li:last-child::before { display: none; }
+  .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); margin-top: 4px; position: relative; z-index: 1; }
+  .gates li[data-s="done"] .dot { background: var(--done); border-color: var(--done); }
+  .gates li[data-s="now"] .dot { border-color: var(--now); box-shadow: 0 0 0 4px var(--amber-soft); }
+  .gates li[data-s="done"] .g-title { color: var(--muted); }
+  .gates li[data-s="now"] .g-title { font-weight: 600; }
+  .g-title { font-size: 14.5px; line-height: 1.5; }
+  .g-sub { font-size: 12px; color: var(--muted); display: block; }
+  .dday { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; padding-top: 2px; white-space: nowrap; }
+  .dday.soon { color: var(--amber); font-weight: 500; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .tile { display: grid; gap: 2px; }
+  .tile .n { font-family: var(--mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .tile .l { font-size: 12px; color: var(--muted); }
+  .spark { width: 100%; height: auto; display: block; margin-top: 14px; }
+  .spark text { font-family: var(--mono); font-size: 10px; fill: var(--muted); }
+  .hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; align-items: end; height: 44px; margin-top: 6px; }
+  .hours span { background: var(--build); opacity: 0.8; border-radius: 2px 2px 0 0; min-height: 2px; }
+  .hours-axis { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tools span { font-family: var(--mono); font-size: 11.5px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; color: var(--ink-2); }
+  .sub-h { font-size: 13px; font-weight: 600; margin: 18px 0 0; color: var(--ink-2); }
+
+  /* ---------- chapters ---------- */
+  .read { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 4px; }
+  .toc a { display: grid; gap: 0; padding: 8px 12px; border-radius: 10px; color: var(--ink-2); text-decoration: none; font-size: 14px; border-left: 3px solid transparent; }
+  .toc a:hover { background: var(--surface); }
+  .toc a.active { background: var(--surface); border-left-color: var(--amber); color: var(--ink); }
+  .toc small { font-family: var(--mono); font-size: 10.5px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .progress { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; margin: 8px 12px 0; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--amber); transition: width 0.2s; }
+  .chapters { display: grid; gap: 22px; }
+  .chapter { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(22px, 3.5vw, 40px); scroll-margin-top: 16px; }
+  .chapter header { display: grid; gap: 8px; margin-bottom: 18px; }
+  .chapter h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(22px, 2.8vw, 30px); line-height: 1.35; }
+  .evidence { margin: 0 0 22px; padding: 14px 16px; background: var(--surface-2); border-radius: 10px; font-size: 14px; color: var(--ink-2); display: grid; gap: 4px; }
+  .evidence .label { font-size: 10.5px; }
+  .prose { max-width: 66ch; font-size: 16.5px; line-height: 1.85; }
+  .prose p { margin: 0 0 1.05em; }
+  .prose h3 { font-family: var(--serif); font-weight: 700; font-size: 18px; margin: 1.6em 0 0.5em; }
+  .prose ul, .prose ol { margin: 0 0 1.05em; padding-left: 1.3em; }
+  .prose li { margin: 0.3em 0; }
+  .prose blockquote { margin: 1.2em 0; padding: 2px 0 2px 16px; border-left: 2px solid var(--amber); font-family: var(--serif); font-size: 17.5px; color: var(--ink); }
+  .prose strong { font-weight: 600; background: linear-gradient(transparent 62%, var(--amber-soft) 62%); }
+  .prose code { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); border: 1px solid var(--line); padding: 0 5px; border-radius: 5px; }
+  .actions { list-style: none; margin: 24px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+  .actions li label { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; cursor: pointer; font-size: 15px; }
+  .actions input { width: 17px; height: 17px; margin-top: 5px; accent-color: var(--amber); }
+  .actions li.checked span { color: var(--muted); text-decoration: line-through; }
+
+  /* ---------- claude tips ---------- */
+  .tips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .tip { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; align-content: start; }
+  .tip h3 { font-size: 17px; font-weight: 600; }
+  .tip .why { font-size: 13.5px; color: var(--muted); margin: 0; }
+  .tip .how { font-size: 14.5px; margin: 0; color: var(--ink-2); }
+  .prompt-box { position: relative; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; color: var(--ink); }
+  .copy { justify-self: start; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 12px; font-size: 13px; color: var(--ink-2); }
+  .copy:hover { border-color: var(--amber); color: var(--ink); }
+
+  /* ---------- content mission ---------- */
+  .mission { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+  .mission .q { font-family: var(--serif); font-size: clamp(20px, 2.4vw, 26px); line-height: 1.45; margin: 6px 0 14px; }
+  .shots { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  .shot { border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; display: grid; gap: 6px; align-content: start; cursor: pointer; background: var(--surface); transition: border-color 0.15s, background 0.15s; min-height: 120px; }
+  .shot b { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em; }
+  .shot span { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+  .shot input { position: absolute; opacity: 0; pointer-events: none; }
+  .shot.on { border-color: var(--content); background: color-mix(in srgb, var(--content) 10%, var(--surface)); }
+  .shot.on b::after { content: " ✓"; color: var(--content); }
+  .memo { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; color: var(--ink-2); font-size: 15px; }
+  .seed { margin-top: 16px; padding: 12px 14px; border: 1px dashed var(--content); border-radius: 10px; font-size: 14.5px; }
+
+  /* ---------- watch + evening ---------- */
+  .watch { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .watch li { padding-left: 18px; position: relative; font-size: 15px; color: var(--ink-2); }
+  .watch li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 8px; height: 2px; background: var(--amber); }
+  .evening { display: grid; gap: 16px; }
+  .evening label { display: grid; gap: 6px; font-family: var(--serif); font-size: 16.5px; }
+  .evening textarea { font-family: var(--sans); font-size: 15px; min-height: 76px; resize: vertical; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .row-btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { border: 1px solid var(--ink); background: var(--ink); color: var(--surface); border-radius: 10px; padding: 8px 16px; font-weight: 500; font-size: 14px; }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .status { font-size: 13px; color: var(--muted); }
+  footer { text-align: center; font-size: 12.5px; color: var(--muted); padding-top: 8px; display: grid; gap: 2px; }
+
+  @media (max-width: 920px) {
+    .card-row, .grid-2, .mission { grid-template-columns: minmax(0, 1fr); }
+    .read { grid-template-columns: minmax(0, 1fr); }
+    .toc { position: static; grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; padding-bottom: 4px; }
+    .toc a { border-left: 0; border-bottom: 3px solid transparent; }
+    .toc a.active { border-bottom-color: var(--amber); }
+    .progress { display: none; }
+    .tips { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 15.5px; }
+    .sky { padding: 20px 18px 6px; }
+    .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plan li { grid-template-columns: 70px 18px minmax(0, 1fr); gap: 8px; }
+    .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .tile .n { font-size: 20px; }
+    .line3 { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <section class="sky" id="sky" aria-label="오늘">
+    <div class="sky-top">
+      <span class="date" id="date"></span>
+      <button class="theme-btn" id="themeBtn" type="button">테마</button>
+    </div>
+    <p class="greeting" id="greeting"></p>
+    <h1 class="one-line" id="oneLine"></h1>
+    <svg class="horizon" id="horizon" viewBox="0 0 1000 170" role="img" aria-label="오늘 하루의 흐름과 지금 시각"></svg>
+    <div class="sky-meta" id="skyMeta"></div>
+  </section>
+
+  <section class="card-row">
+    <article class="three" aria-labelledby="threeTitle">
+      <div class="three-head">
+        <h2 id="threeTitle">오늘의 3줄</h2>
+        <span class="label">A · B · Bridge</span>
+      </div>
+      <div class="line3" data-k="reality"><span class="k">현재</span><div class="v" id="l-reality" contenteditable="true" spellcheck="false"></div></div>
+      <div class="line3" data-k="wish"><span class="k">바람</span><div class="v" id="l-wish" contenteditable="true" spellcheck="false"></div></div>
+      <div class="line3" data-k="choice"><span class="k">선택</span><div class="v" id="l-choice" contenteditable="true" spellcheck="false"></div></div>
+      <p class="hint">AI가 비춘 초안입니다. 범님의 말로 고쳐 쓰면 이 컴퓨터에 저장되고, 밤 Return에 함께 담깁니다.</p>
+    </article>
+    <aside class="panel return-q">
+      <span class="label">어제로부터의 Return</span>
+      <blockquote id="returnQ"></blockquote>
+      <dl class="focus-list" id="buildFocus"></dl>
+    </aside>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="section-head"><h2>오늘의 흐름</h2><span class="label num" id="planCount"></span></div>
+      <ol class="plan" id="plan"></ol>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <div class="section-head"><h2>게이트</h2><span class="label">모두의창업 · Creator OS</span></div>
+        <ul class="gates" id="gates"></ul>
+      </div>
+      <div class="panel">
+        <div class="section-head"><h2>Claude와 보낸 시간</h2><span class="label" id="statsRange"></span></div>
+        <div class="tiles" id="tiles"></div>
+        <svg class="spark" id="spark" viewBox="0 0 320 78" role="img" aria-label="최근 14일 Claude Code 메시지 수"></svg>
+        <p class="sub-h">어느 시간에 일하나요</p>
+        <div class="hours" id="hours" aria-label="시간대별 메시지 수"></div>
+        <div class="hours-axis"><span>0시</span><span>6</span><span>12</span><span>18</span><span>23</span></div>
+        <div class="tools" id="tools"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="read" aria-label="오늘의 조언">
+    <nav class="toc" id="toc" aria-label="장 목록"></nav>
+    <div class="chapters" id="chapters"></div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Claude Code, 오늘 이렇게 써 보세요</h2><span class="label">복사해서 바로 붙여넣기</span></div>
+    <div class="tips" id="tips"></div>
+  </section>
+
+  <section class="panel">
+    <div class="mission">
+      <div>
+        <span class="label">오늘 품고 다닐 질문 · Capture lightly</span>
+        <p class="q" id="missionQ"></p>
+        <ul class="shots" id="shots"></ul>
+        <div class="seed" id="seed"></div>
+      </div>
+      <div>
+        <span class="label">경험 10~30분 뒤 · 30~60초 Voice Memo</span>
+        <ol class="memo" id="memo" style="margin-top:10px"></ol>
+        <p class="sub-h" style="margin-top:22px">오늘 조심할 패턴</p>
+        <ul class="watch" id="watch" style="margin-top:8px"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="eveningTitle">
+    <div class="section-head"><h2 id="eveningTitle">오늘 밤 3분 Return</h2><span class="label">내일 아침의 A가 됩니다</span></div>
+    <form class="evening" id="evening"></form>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const BRIEF = "__BRIEF_DATA__";
+
+(function () {
+  const D = typeof BRIEF === "object" && BRIEF ? BRIEF : {};
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const key = (k) => `onmoment:${D.date || "today"}:${k}`;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(key(k)); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(key(k), JSON.stringify(v)); } catch (e) {} },
+  };
+  const TAGS = { life: "삶", build: "빌드", content: "콘텐츠", claude: "Claude", rest: "쉼" };
+  const toMin = (t) => { const m = /^(\d{1,2}):(\d{2})/.exec(t || ""); return m ? +m[1] * 60 + +m[2] : null; };
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const isToday = D.date === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+  // ---------- theme toggle
+  const themeBtn = $("themeBtn");
+  const applyTheme = (t) => { if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); themeBtn.textContent = t === "dark" ? "밤 테마" : t === "light" ? "낮 테마" : "시스템 테마"; };
+  let theme = null; try { theme = localStorage.getItem("onmoment:theme"); } catch (e) {}
+  applyTheme(theme);
+  themeBtn.addEventListener("click", () => { theme = theme === null ? "light" : theme === "light" ? "dark" : null; try { theme ? localStorage.setItem("onmoment:theme", theme) : localStorage.removeItem("onmoment:theme"); } catch (e) {} applyTheme(theme); });
+
+  // ---------- sky
+  const h = isToday ? now.getHours() : 6;
+  const sky = h < 6 ? ["rgba(70,80,160,.30)", "rgba(150,110,170,.18)"]
+    : h < 9 ? ["rgba(130,140,210,.22)", "rgba(240,160,95,.30)"]
+    : h < 16 ? ["rgba(120,175,220,.22)", "rgba(210,225,215,.18)"]
+    : h < 19 ? ["rgba(235,180,110,.26)", "rgba(220,120,90,.20)"]
+    : ["rgba(60,70,140,.30)", "rgba(120,90,150,.20)"];
+  $("sky").style.setProperty("--sky", `linear-gradient(180deg, ${sky[0]}, ${sky[1]})`);
+
+  const [y, mo, d] = (D.date || "").split("-");
+  $("date").textContent = D.date ? `${y}. ${+mo}. ${+d} (${D.weekday || ""}) · 온순간 아침 창` : "온순간 아침 창";
+  $("greeting").textContent = D.greeting || "";
+  $("oneLine").textContent = D.one_line || "";
+
+  // ---------- horizon arc: 05:00 → 23:00
+  (function drawHorizon() {
+    const svg = $("horizon"), W = 1000, x0 = 30, x1 = 970, base = 132, lift = 104;
+    const start = 5 * 60, end = 23 * 60;
+    const X = (m) => x0 + (Math.min(Math.max(m, start), end) - start) / (end - start) * (x1 - x0);
+    const Y = (m) => base - Math.sin(Math.PI * (Math.min(Math.max(m, start), end) - start) / (end - start)) * lift;
+    let path = "";
+    for (let m = start; m <= end; m += 10) path += `${m === start ? "M" : "L"}${X(m).toFixed(1)},${Y(m).toFixed(1)}`;
+    const color = (t) => `var(--${TAGS[t] ? t : "rest"})`;
+    let out = `<line x1="${x0}" y1="${base}" x2="${x1}" y2="${base}" stroke="var(--line)" stroke-width="1.5"/>`;
+    out += `<path d="${path}" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 5" opacity=".7"/>`;
+    (D.day_plan || []).forEach((b) => {
+      const s = toMin(b.time), e = toMin(b.end) ?? (s + 30);
+      if (s == null) return;
+      out += `<rect x="${X(s).toFixed(1)}" y="${base + 6}" width="${Math.max(3, X(e) - X(s) - 2).toFixed(1)}" height="7" rx="3" fill="${color(b.tag)}" opacity=".85"><title>${esc(b.time + " " + b.title)}</title></rect>`;
+    });
+    [6, 9, 12, 15, 18, 21].forEach((hh) => { out += `<text x="${X(hh * 60)}" y="${base + 32}" text-anchor="middle">${String(hh).padStart(2, "0")}</text>`; });
+    const sm = isToday ? nowMin : 6 * 60;
+    const sx = X(sm), sy = Y(sm);
+    out += `<circle cx="${sx}" cy="${sy}" r="22" fill="var(--amber)" opacity=".16"/><circle cx="${sx}" cy="${sy}" r="11" fill="var(--amber)"/>`;
+    out += `<line x1="${sx}" y1="${sy + 12}" x2="${sx}" y2="${base}" stroke="var(--amber)" stroke-width="1" stroke-dasharray="2 3"/>`;
+    svg.innerHTML = out;
+  })();
+
+  const src = { "claude-cli": "Claude Code 구독", api: "Anthropic API", offline: "오프라인 내장 조언", manual: "미리보기" }[D.meta?.source] || D.meta?.source || "";
+  const chars = D.meta?.chapter_chars || (D.chapters || []).reduce((a, c) => a + (c.body_md || "").length, 0);
+  $("skyMeta").innerHTML = [
+    `오늘의 조언 <b class="num">${chars.toLocaleString()}</b>자`,
+    `최근 7일 대화 <b class="num">${(D.stats?.messages_recent ?? 0).toLocaleString()}</b>개를 읽음`,
+    src ? `생성 · ${esc(src)}` : "",
+  ].filter(Boolean).map((s) => `<span>${s}</span>`).join("");
+
+  // ---------- three lines (editable)
+  ["reality", "wish", "choice"].forEach((k) => {
+    const el = $("l-" + k);
+    el.textContent = store.get("3-" + k, D.three_lines?.[k] || "");
+    el.addEventListener("input", () => store.set("3-" + k, el.textContent));
+  });
+  $("returnQ").textContent = D.return_question || "";
+  const bf = D.build_focus || {};
+  $("buildFocus").innerHTML = [["지금의 게이트", bf.gate], ["오늘 단 하나", bf.today_task], ["끝났다고 말할 기준", bf.metric]]
+    .filter((r) => r[1]).map((r) => `<div><dt>${r[0]}</dt><dd>${esc(r[1])}</dd></div>`).join("");
+
+  // ---------- plan
+  const planDone = store.get("plan", {});
+  const plan = D.day_plan || [];
+  const renderCount = () => { const n = plan.filter((_, i) => planDone[i]).length; $("planCount").textContent = `${n} / ${plan.length}`; };
+  $("plan").innerHTML = plan.map((b, i) => {
+    const s = toMin(b.time), e = toMin(b.end);
+    const live = isToday && s != null && nowMin >= s && nowMin < (e ?? s + 60);
+    const tag = TAGS[b.tag] ? b.tag : "rest";
+    return `<li class="${live ? "is-now" : ""}${planDone[i] ? " checked" : ""}" data-i="${i}">
+      <span class="t">${esc(b.time)}${b.end ? "–" + esc(b.end) : ""}</span>
+      <input type="checkbox" id="plan-${i}" ${planDone[i] ? "checked" : ""} aria-label="${esc(b.title)} 완료">
+      <div><div class="ttl"><span>${esc(b.title)}</span><span class="chip tag-${tag}">${TAGS[tag]}</span></div><div class="det">${esc(b.detail)}</div></div>
+    </li>`;
+  }).join("");
+  $("plan").addEventListener("change", (ev) => {
+    const li = ev.target.closest("li"); const i = +li.dataset.i;
+    planDone[i] = ev.target.checked; li.classList.toggle("checked", ev.target.checked); store.set("plan", planDone); renderCount();
+  });
+  renderCount();
+
+  // ---------- gates
+  const ms = D.milestones || [];
+  $("gates").innerHTML = ms.map((m) => {
+    let dd = "";
+    if (typeof m.dday === "number") dd = m.dday === 0 ? "D-DAY" : m.dday > 0 ? `D-${m.dday}` : `D+${-m.dday}`;
+    else if (m.status !== "done") dd = "날짜 미정";
+    const soon = typeof m.dday === "number" && m.dday >= 0 && m.dday <= 14;
+    const st = { done: "완료", now: "진행 중", next: "다음" }[m.status] || "";
+    return `<li data-s="${esc(m.status)}"><span class="dot" aria-hidden="true"></span>
+      <span class="g-title">${esc(m.title)}<span class="g-sub">${st}${m.track ? " · " + (m.track === "content" ? "콘텐츠" : "빌드") : ""}</span></span>
+      <span class="dday${soon ? " soon" : ""}">${dd}</span></li>`;
+  }).join("") || `<li><span></span><span class="g-title">config.json 에 milestones를 적어 주세요.</span></li>`;
+
+  // ---------- stats
+  const S = D.stats || {};
+  $("statsRange").textContent = "최근 14일";
+  $("tiles").innerHTML = [
+    [S.sessions_recent ?? 0, "7일 세션"],
+    [S.messages_recent ?? 0, "7일 내 메시지"],
+    [S.active_days_period ?? 0, "30일 중 활동일"],
+  ].map(([n, l]) => `<div class="tile"><span class="n">${Number(n).toLocaleString()}</span><span class="l">${l}</span></div>`).join("");
+  (function spark() {
+    const days = S.daily || []; if (!days.length) return;
+    const W = 320, H = 78, pad = 6, top = 8, bottom = 60;
+    const max = Math.max(1, ...days.map((d) => d.count));
+    const X = (i) => pad + i * (W - pad * 2) / (days.length - 1 || 1);
+    const Yv = (v) => bottom - (v / max) * (bottom - top);
+    let line = days.map((d, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Yv(d.count).toFixed(1)}`).join("");
+    const area = `${line}L${X(days.length - 1)},${bottom}L${X(0)},${bottom}Z`;
+    const last = days[days.length - 1];
+    let out = `<line x1="${pad}" y1="${bottom}" x2="${W - pad}" y2="${bottom}" stroke="var(--line)"/>`;
+    out += `<line x1="${pad}" y1="${top}" x2="${W - pad}" y2="${top}" stroke="var(--line)" stroke-dasharray="2 4"/>`;
+    out += `<path d="${area}" fill="var(--build)" opacity=".12"/><path d="${line}" fill="none" stroke="var(--build)" stroke-width="2" stroke-linejoin="round"/>`;
+    out += `<circle cx="${X(days.length - 1)}" cy="${Yv(last.count)}" r="3.5" fill="var(--amber)"/>`;
+    out += `<text x="${pad}" y="${H - 4}">${days[0].date.slice(5).replace("-", "/")}</text><text x="${W - pad}" y="${H - 4}" text-anchor="end">오늘 ${last.count}</text>`;
+    out += `<text x="${W - pad}" y="${top - 1}" text-anchor="end" dy="-1">최대 ${max}</text>`;
+    $("spark").innerHTML = out;
+  })();
+  const hrs = S.hours || [];
+  const hmax = Math.max(1, ...hrs);
+  $("hours").innerHTML = hrs.map((v, i) => `<span style="height:${Math.max(4, (v / hmax) * 100)}%;${i < 5 || i >= 23 ? "background:var(--content)" : ""}" title="${i}시 · ${v}개"></span>`).join("");
+  $("tools").innerHTML = (S.top_tools || []).slice(0, 6).map(([n, c]) => `<span>${esc(n)} ${c}</span>`).join("");
+
+  // ---------- chapters
+  function md(src) {
+    const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
+    const lines = String(src || "").split(/\r?\n/); let html = "", list = null, para = [];
+    const flush = () => { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } if (list) { html += `</${list}>`; list = null; } };
+    for (const raw of lines) {
+      const l = raw.trim();
+      if (!l) { flush(); continue; }
+      let m;
+      if ((m = /^#{2,4}\s+(.*)/.exec(l))) { flush(); html += `<h3>${inline(m[1])}</h3>`; }
+      else if ((m = /^>\s?(.*)/.exec(l))) { flush(); html += `<blockquote>${inline(m[1])}</blockquote>`; }
+      else if ((m = /^[-*]\s+(.*)/.exec(l))) { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } if (list !== "ul") { if (list) html += `</${list}>`; html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = /^\d+[.)]\s+(.*)/.exec(l))) { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } if (list !== "ol") { if (list) html += `</${list}>`; html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
+      else { if (list) { html += `</${list}>`; list = null; } para.push(l); }
+    }
+    flush(); return html;
+  }
+  const chapters = D.chapters || [];
+  const actDone = store.get("actions", {});
+  $("chapters").innerHTML = chapters.map((c, ci) => {
+    const tag = TAGS[c.id] ? c.id : "rest";
+    return `<article class="chapter" id="ch-${esc(c.id || ci)}">
+      <header><span class="label tag-${tag}">${esc(c.kicker || TAGS[tag])}</span><h2>${esc(c.title)}</h2></header>
+      ${c.evidence ? `<div class="evidence"><span class="label">범님의 대화에서</span><span>${esc(c.evidence)}</span></div>` : ""}
+      <div class="prose">${md(c.body_md)}</div>
+      ${(c.actions || []).length ? `<ul class="actions">${c.actions.map((a, ai) => { const k = ci + "-" + ai; return `<li class="${actDone[k] ? "checked" : ""}"><label><input type="checkbox" id="act-${k}" data-k="${k}" ${actDone[k] ? "checked" : ""}><span>${esc(a)}</span></label></li>`; }).join("")}</ul>` : ""}
+    </article>`;
+  }).join("");
+  $("chapters").addEventListener("change", (ev) => {
+    const k = ev.target.dataset.k; if (!k) return;
+    actDone[k] = ev.target.checked; ev.target.closest("li").classList.toggle("checked", ev.target.checked); store.set("actions", actDone);
+  });
+  $("toc").innerHTML = chapters.map((c, ci) => `<a href="#ch-${esc(c.id || ci)}" data-i="${ci}"><small>${esc(TAGS[c.id] || "")}</small>${esc(c.title)}</a>`).join("") + `<div class="progress" aria-hidden="true"><i id="prog"></i></div>`;
+  const tocLinks = [...document.querySelectorAll("#toc a")];
+  const arts = [...document.querySelectorAll(".chapter")];
+  const onScroll = () => {
+    let active = 0;
+    arts.forEach((a, i) => { if (a.getBoundingClientRect().top < window.innerHeight * 0.35) active = i; });
+    tocLinks.forEach((l, i) => l.classList.toggle("active", i === active));
+    if (arts.length) {
+      const first = arts[0].getBoundingClientRect().top + window.scrollY, last = arts[arts.length - 1];
+      const endY = last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+      const p = Math.min(1, Math.max(0, (window.scrollY - first + 200) / Math.max(1, endY - first + 200)));
+      const prog = $("prog"); if (prog) prog.style.width = (p * 100).toFixed(1) + "%";
+    }
+  };
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+  // ---------- claude tips
+  $("tips").innerHTML = (D.claude_code || []).map((t, i) => `<article class="tip">
+      <h3>${esc(t.title)}</h3><p class="why">${esc(t.why)}</p><p class="how">${esc(t.how)}</p>
+      ${t.prompt ? `<pre class="prompt-box" id="pr-${i}">${esc(t.prompt)}</pre><button class="copy" type="button" data-i="${i}">프롬프트 복사</button>` : ""}
+    </article>`).join("");
+  $("tips").addEventListener("click", async (ev) => {
+    const b = ev.target.closest(".copy"); if (!b) return;
+    const box = $("pr-" + b.dataset.i);
+    try { await navigator.clipboard.writeText(box.textContent); b.textContent = "복사됨"; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(box); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "선택됨 · Ctrl+C"; }
+    setTimeout(() => (b.textContent = "프롬프트 복사"), 1800);
+  });
+
+  // ---------- content mission
+  const cm = D.content_mission || {};
+  $("missionQ").textContent = cm.question || "";
+  const shotsDone = store.get("shots", {});
+  $("shots").innerHTML = (cm.shots || []).map((s, i) => `<li><label class="shot${shotsDone[i] ? " on" : ""}" for="shot-${i}"><input type="checkbox" id="shot-${i}" data-i="${i}" ${shotsDone[i] ? "checked" : ""}><b>${esc(s.key)}</b><span>${esc(s.hint)}</span></label></li>`).join("");
+  $("shots").addEventListener("change", (ev) => { const i = ev.target.dataset.i; shotsDone[i] = ev.target.checked; ev.target.closest(".shot").classList.toggle("on", ev.target.checked); store.set("shots", shotsDone); });
+  $("seed").innerHTML = cm.episode_seed ? `<span class="label">이번 주 에피소드 씨앗</span><div>${esc(cm.episode_seed)}</div>` : "";
+  $("seed").hidden = !cm.episode_seed;
+  $("memo").innerHTML = (cm.voice_memo || []).map((q) => `<li>${esc(q)}</li>`).join("");
+  $("watch").innerHTML = (D.watchouts || []).map((w) => `<li>${esc(w)}</li>`).join("");
+
+  // ---------- evening return
+  const ev = D.evening || [];
+  const answers = store.get("evening", {});
+  $("evening").innerHTML = ev.map((q, i) => `<label for="ev-${i}">${esc(q)}<textarea id="ev-${i}" data-i="${i}" placeholder="짧게, 있는 그대로.">${esc(answers[i] || "")}</textarea></label>`).join("") +
+    `<div class="row-btns"><button class="btn" type="submit">Return 파일로 저장</button><button class="btn ghost" type="button" id="copyReturn">텍스트 복사</button><span class="status" id="evStatus">입력은 이 컴퓨터에 자동 저장됩니다.</span></div>`;
+  $("evening").addEventListener("input", (e) => { const i = e.target.dataset.i; if (i == null) return; answers[i] = e.target.value; store.set("evening", answers); });
+  const returnText = () => {
+    const three = ["reality", "wish", "choice"].map((k) => $("l-" + k).textContent.trim());
+    const planN = plan.filter((_, i) => planDone[i]).length;
+    return `# 온순간 Return · ${D.date}\n\n## 오늘의 3줄\n- 현재: ${three[0]}\n- 바람: ${three[1]}\n- 선택: ${three[2]}\n\n## 흐름\n- 완료한 블록: ${planN} / ${plan.length}\n` +
+      plan.map((b, i) => `  - [${planDone[i] ? "x" : " "}] ${b.time} ${b.title}`).join("\n") +
+      `\n\n## 밤 3분\n` + ev.map((q, i) => `### ${q}\n${(answers[i] || "").trim() || "(비움)"}\n`).join("\n");
+  };
+  $("evening").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const blob = new Blob([returnText()], { type: "text/markdown;charset=utf-8" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `onmoment-return-${D.date}.md`;
+    document.body.appendChild(a); a.click(); a.remove();
+    $("evStatus").textContent = "다운로드 폴더에 저장했습니다. 내일 아침 조언이 이 기록을 읽습니다.";
+  });
+  $("copyReturn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(returnText()); $("evStatus").textContent = "복사했습니다."; }
+    catch (e) { $("evStatus").textContent = "복사가 막혀 있습니다. 파일 저장을 이용해 주세요."; }
+  });
+
+  $("foot").innerHTML = `<span>Live fully. Capture lightly. Reflect honestly.</span><span>${esc(D.meta?.generated_at ? "생성 " + D.meta.generated_at.replace("T", " ") : "")}</span>`;
+})();
+</script>
+</body>
+</html>

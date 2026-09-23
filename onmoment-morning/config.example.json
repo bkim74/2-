@@ -1,0 +1,42 @@
+{
+  "name": "범",
+  "timezone_note": "시간은 컴퓨터의 로컬 시간을 따릅니다.",
+
+  "data_dir": "~/OnMoment/morning",
+
+  "engine": "auto",
+  "engine_help": "auto = claude CLI(구독) → Anthropic API → 오프라인 순서로 시도. 'claude-cli' | 'api' | 'offline' 로 고정 가능.",
+  "claude_cli_model": "",
+  "api_model": "claude-opus-5",
+
+  "window_mode": "app",
+  "window_mode_help": "app = Edge/Chrome 앱 창(주소창 없는 독립 창)으로 띄움, browser = 기본 브라우저 탭",
+
+  "history": {
+    "claude_code_projects_dir": "~/.claude/projects",
+    "claude_ai_export": "",
+    "claude_ai_export_help": "claude.ai > Settings > Privacy > Export data 로 받은 zip을 풀어서 conversations.json 경로를 적으면 웹/앱 대화도 함께 읽습니다.",
+    "recent_days": 7,
+    "stats_days": 30,
+    "max_history_chars": 45000
+  },
+
+  "context_dirs": ["./context"],
+  "context_help": "여기에 .md / .txt / .docx 파일을 넣으면 매일 조언에 반영됩니다. (파일당 최대 12,000자)",
+
+  "journal_dirs": ["~/Downloads", "~/OnMoment/morning/returns"],
+  "journal_help": "대시보드의 '오늘 밤 Return' 저장 버튼으로 받은 onmoment-return-*.md 파일을 다음 날 아침 읽어옵니다.",
+
+  "milestones": [
+    { "title": "13주 클로즈드 베타 (40테이블·7,194건)", "date": "2026-08-31", "status": "done", "track": "build" },
+    { "title": "모두의창업 v2 최종본 제출", "date": null, "status": "done", "track": "build" },
+    { "title": "변리사 상담 · IP Map (유튜브 공개 전)", "date": null, "status": "now", "track": "build" },
+    { "title": "Creator OS Phase 0 — 정본 세팅 1주", "date": null, "status": "now", "track": "content" },
+    { "title": "1R 50명 코호트 시작 (Insight 20% 검증)", "date": null, "status": "next", "track": "build" },
+    { "title": "Creator OS Phase 1 — 비공개 4편", "date": null, "status": "next", "track": "content" },
+    { "title": "법인 설립 · IP 이전/라이선스", "date": null, "status": "next", "track": "build" },
+    { "title": "기관 유료 파일럿 1건 (30명+)", "date": null, "status": "next", "track": "build" },
+    { "title": "공개 Pilot 8주 (Long 8 + Shorts 12~16)", "date": null, "status": "next", "track": "content" }
+  ],
+  "milestones_help": "date 에 'YYYY-MM-DD'를 넣으면 대시보드에 D-day가 표시됩니다. status: done | now | next"
+}
