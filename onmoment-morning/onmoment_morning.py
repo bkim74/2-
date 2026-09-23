@@ -15,6 +15,7 @@
     python onmoment_morning.py --offline    # LLM 없이 내장 조언으로 생성
     python onmoment_morning.py --no-open    # 생성만 하고 창은 띄우지 않음
     python onmoment_morning.py --render brief.json   # 주어진 JSON으로 대시보드만 렌더
+    python onmoment_morning.py --diagnose   # 설치 상태 점검 (문제가 생기면 이 결과를 Claude에게 보여주세요)
 """
 
 from __future__ import annotations
@@ -367,8 +368,24 @@ def build_prompt(cfg: dict, today: dt.date, context: str, milestones: list[dict]
 
 # ---------------------------------------------------------------- engines
 
-def run_claude_cli(prompt: str, model: str) -> str:
+def find_claude() -> str | None:
+    """PATH에 없더라도 흔한 설치 위치에서 claude CLI를 찾는다."""
     exe = shutil.which("claude")
+    if exe:
+        return exe
+    home = Path.home()
+    candidates = [home / ".local" / "bin" / "claude", home / ".claude" / "local" / "claude"]
+    if sys.platform.startswith("win"):
+        appdata = Path(os.environ.get("APPDATA", home / "AppData" / "Roaming"))
+        candidates = [home / ".local" / "bin" / "claude.exe", appdata / "npm" / "claude.cmd",
+                      home / ".claude" / "local" / "claude.exe"] + candidates
+    else:
+        candidates += [Path("/opt/homebrew/bin/claude"), Path("/usr/local/bin/claude")]
+    return next((str(c) for c in candidates if c.exists()), None)
+
+
+def run_claude_cli(prompt: str, model: str) -> str:
+    exe = find_claude()
     if not exe:
         raise RuntimeError("claude CLI를 찾지 못했습니다")
     cmd = [exe, "-p", "--output-format", "text"]
@@ -493,8 +510,30 @@ def acquire_lock(lock: Path) -> bool:
     return True
 
 
+def diagnose(cfg: dict) -> int:
+    """설치가 안 될 때 원인을 한눈에 보여준다."""
+    hist = cfg["history"]
+    projects = expand(hist["claude_code_projects_dir"])
+    sessions = glob.glob(str(projects / "*" / "*.jsonl"))
+    rows = [
+        ("Python", f"{sys.version.split()[0]} · {sys.executable}"),
+        ("도구 폴더", str(HERE)),
+        ("template.html", "있음" if TEMPLATE.exists() else "없음 — 압축을 다시 풀어 주세요"),
+        ("config.json", "있음" if (HERE / "config.json").exists() else "없음"),
+        ("claude CLI", find_claude() or "찾지 못함 → 오프라인 조언으로 열립니다"),
+        ("ANTHROPIC_API_KEY", "설정됨" if os.environ.get("ANTHROPIC_API_KEY") else "없음"),
+        ("Claude Code 기록", f"{projects} · 세션 파일 {len(sessions)}개"),
+        ("앱 창 브라우저", find_app_browser() or "찾지 못함 → 기본 브라우저 탭으로 엽니다"),
+        ("데이터 폴더", str(expand(cfg.get("data_dir", "~/OnMoment/morning")))),
+    ]
+    for k, v in rows:
+        print(f"{k:<18} {v}")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="온순간 아침 창")
+    ap.add_argument("--diagnose", action="store_true", help="설치 상태 점검")
     ap.add_argument("--force", action="store_true", help="오늘 조언을 새로 생성")
     ap.add_argument("--offline", action="store_true", help="LLM 없이 내장 조언 사용")
     ap.add_argument("--no-open", action="store_true", help="창을 띄우지 않음")
@@ -503,6 +542,8 @@ def main() -> int:
     args = ap.parse_args()
 
     cfg = load_config()
+    if args.diagnose:
+        return diagnose(cfg)
     data_dir = expand(cfg.get("data_dir", "~/OnMoment/morning"))
     briefs_dir = data_dir / "briefs"
     (data_dir / "returns").mkdir(parents=True, exist_ok=True)
@@ -610,4 +651,16 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    for stream in (sys.stdout, sys.stderr):  # Windows 콘솔(cp949)에서도 한글 출력이 깨지지 않게
+        if stream is not None and hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+    try:
+        sys.exit(main())
+    except Exception:  # pythonw로 실행되면 에러가 화면에 안 보이므로 로그에 남긴다
+        import traceback
+
+        crash_dir = Path.home() / "OnMoment" / "morning"
+        crash_dir.mkdir(parents=True, exist_ok=True)
+        with open(crash_dir / "morning.log", "a", encoding="utf-8") as f:
+            f.write(f"[{dt.datetime.now():%Y-%m-%d %H:%M:%S}] 실행 오류\n{traceback.format_exc()}\n")
+        raise

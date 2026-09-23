@@ -29,12 +29,20 @@
 (이미 쓰고 계신 구독으로 조언을 생성합니다. API 키는 필요 없습니다.)
 
 1. 이 폴더(`onmoment-morning`)를 컴퓨터의 원하는 위치에 둡니다. 예: `C:\OnMoment\onmoment-morning`, `~/OnMoment/onmoment-morning`
-2. 설치 스크립트를 실행합니다.
+2. 설치합니다.
 
-**Windows** (PowerShell)
-```powershell
-powershell -ExecutionPolicy Bypass -File install\install_windows.ps1
-```
+**Windows** — 폴더 안의 **`설치하기.bat`을 더블클릭**하세요. (`onmoment_morning.py`와 같은 폴더에 있습니다)
+
+설치 과정이 창에 단계별로 표시됩니다. Python이 없으면 winget으로 자동 설치하고, 첫 조언 창을 한 번 연 뒤,
+매일 06:00 작업 스케줄러와 로그인 시 시작프로그램에 등록합니다. 관리자 권한은 필요 없습니다.
+
+| 파일 | 하는 일 |
+|---|---|
+| `설치하기.bat` | 설치 (다시 실행해도 안전) |
+| `지금열기.bat` | 오늘의 창 열기 |
+| `다시만들기.bat` | 오늘 조언을 새로 생성 |
+| `점검하기.bat` | 무엇이 문제인지 점검 (결과를 Claude에게 보여주세요) |
+| `제거하기.bat` | 자동 실행 해제 |
 
 **macOS** (터미널)
 ```bash
@@ -51,7 +59,8 @@ bash install/install_linux.sh
 - 6시에 컴퓨터가 꺼져 있었다면 켜진 직후에 실행됩니다.
 - 로그인할 때 이미 오늘 조언이 있다면 **다시 생성하지 않고 창만 엽니다.**
 - 창은 Edge/Chrome의 앱 창(주소창 없는 독립 창)으로 열립니다. `config.json`의 `window_mode`를 `browser`로 바꾸면 일반 탭으로 열립니다.
-- 제거: 같은 스크립트에 `-Uninstall`(Windows) 또는 `--uninstall`(macOS/Linux)을 붙여 실행합니다.
+- 제거: Windows는 `제거하기.bat`, macOS/Linux는 설치 스크립트에 `--uninstall`을 붙여 실행합니다.
+- 설치 기록: `~/OnMoment/morning/install.log`, 실행 기록: `~/OnMoment/morning/morning.log`
 
 ## 손으로 실행하기
 
@@ -59,6 +68,7 @@ bash install/install_linux.sh
 python onmoment_morning.py            # 오늘 조언 열기 (없으면 생성)
 python onmoment_morning.py --force    # 오늘 조언 다시 생성
 python onmoment_morning.py --offline  # 인터넷 없이 내장 조언으로
+python onmoment_morning.py --diagnose # 설치 상태 점검
 ```
 
 ---
