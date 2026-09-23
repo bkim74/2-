@@ -1,18 +1,506 @@
 {
   "name": "범",
   "timezone_note": "시간은 컴퓨터의 로컬 시간을 따릅니다.",
-
   "data_dir": "~/OnMoment/morning",
-
   "engine": "auto",
   "engine_help": "auto = claude CLI(구독) → Anthropic API → 오프라인 순서로 시도. 'claude-cli' | 'api' | 'offline' 로 고정 가능.",
   "claude_cli_model": "",
-  "claude_timeout_sec": 360,
+  "claude_timeout_sec": 420,
   "api_model": "claude-opus-5",
-
+  "radar": {
+    "enabled": true,
+    "timeout_sec": 480,
+    "region": "경기도 (서울·수도권 우선, 주말은 전국)",
+    "help": "매일 아침 Claude가 웹을 검색해 정부지원사업 · AI 교육 · 국내 일정을 찾아옵니다. enabled 를 false 로 하면 끕니다."
+  },
   "window_mode": "app",
   "window_mode_help": "app = Edge/Chrome 앱 창(주소창 없는 독립 창)으로 띄움, browser = 기본 브라우저 탭",
-
+  "weekly_rhythm": {
+    "mon": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "07:00",
+        "end": "09:00",
+        "title": "자전거 · 러닝 + 말씀",
+        "tag": "life",
+        "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."
+      },
+      {
+        "time": "09:00",
+        "end": "13:00",
+        "title": "콘텐츠",
+        "tag": "content",
+        "detail": ""
+      },
+      {
+        "time": "13:00",
+        "end": "14:00",
+        "title": "점심과 쉼",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "14:00",
+        "end": "18:00",
+        "title": "온순간 빌드",
+        "tag": "build",
+        "detail": ""
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ],
+    "tue": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "07:00",
+        "end": "09:00",
+        "title": "자전거 · 러닝 + 말씀",
+        "tag": "life",
+        "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."
+      },
+      {
+        "time": "09:00",
+        "end": "13:00",
+        "title": "콘텐츠",
+        "tag": "content",
+        "detail": ""
+      },
+      {
+        "time": "13:00",
+        "end": "14:00",
+        "title": "점심과 쉼",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "14:00",
+        "end": "18:00",
+        "title": "온순간 빌드",
+        "tag": "build",
+        "detail": ""
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ],
+    "wed": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "07:00",
+        "end": "09:00",
+        "title": "자전거 · 러닝 + 말씀",
+        "tag": "life",
+        "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."
+      },
+      {
+        "time": "09:00",
+        "end": "13:00",
+        "title": "Activity — 안 가본 곳, 안 해본 것",
+        "tag": "content",
+        "detail": ""
+      },
+      {
+        "time": "13:00",
+        "end": "14:00",
+        "title": "점심과 쉼",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "14:00",
+        "end": "18:00",
+        "title": "Activity 이어서",
+        "tag": "content",
+        "detail": ""
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ],
+    "thu": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "07:00",
+        "end": "09:00",
+        "title": "자전거 · 러닝 + 말씀",
+        "tag": "life",
+        "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."
+      },
+      {
+        "time": "09:00",
+        "end": "13:00",
+        "title": "Activity — 안 가본 곳, 안 해본 것",
+        "tag": "content",
+        "detail": ""
+      },
+      {
+        "time": "13:00",
+        "end": "14:00",
+        "title": "점심과 쉼",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "14:00",
+        "end": "18:00",
+        "title": "Activity 이어서",
+        "tag": "content",
+        "detail": ""
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ],
+    "fri": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "07:00",
+        "end": "09:00",
+        "title": "자전거 · 러닝 + 말씀",
+        "tag": "life",
+        "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."
+      },
+      {
+        "time": "09:00",
+        "end": "13:00",
+        "title": "AI 빌드업",
+        "tag": "claude",
+        "detail": ""
+      },
+      {
+        "time": "13:00",
+        "end": "14:00",
+        "title": "점심과 쉼",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "14:00",
+        "end": "18:00",
+        "title": "온순간 빌드",
+        "tag": "build",
+        "detail": ""
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ],
+    "sat": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "07:00",
+        "end": "18:00",
+        "title": "하루 여행 (점심은 아내와)",
+        "tag": "content",
+        "detail": "레이더의 국내 일정에서 한 곳."
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ],
+    "sun": [
+      {
+        "time": "06:00",
+        "end": "07:00",
+        "title": "기도 · 아침 · 스트레칭",
+        "tag": "life",
+        "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
+      },
+      {
+        "time": "09:00",
+        "end": "11:00",
+        "title": "예배",
+        "tag": "life",
+        "detail": ""
+      },
+      {
+        "time": "11:00",
+        "end": "13:00",
+        "title": "주차 봉사",
+        "tag": "life",
+        "detail": ""
+      },
+      {
+        "time": "13:00",
+        "end": "14:00",
+        "title": "어머니 · 가족과 점심",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "14:00",
+        "end": "18:00",
+        "title": "정리와 쉼",
+        "tag": "rest",
+        "detail": ""
+      },
+      {
+        "time": "18:00",
+        "end": "19:00",
+        "title": "저녁",
+        "tag": "rest",
+        "detail": "가족과 식탁. 조언 대신 질문 하나."
+      },
+      {
+        "time": "19:00",
+        "end": "20:00",
+        "title": "글쓰기",
+        "tag": "content",
+        "detail": "아빠는 스토리두어 — 오늘의 한 장면을 한 문단으로."
+      },
+      {
+        "time": "20:00",
+        "end": "21:00",
+        "title": "운동",
+        "tag": "life",
+        "detail": "짐 · 러닝 · 수영 중 하나."
+      },
+      {
+        "time": "21:00",
+        "end": "22:00",
+        "title": "온순간 블로그",
+        "tag": "content",
+        "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
+      },
+      {
+        "time": "22:00",
+        "end": "22:15",
+        "title": "밤 3분 Return, 그리고 Dream",
+        "tag": "life",
+        "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
+      }
+    ]
+  },
+  "weekly_rhythm_help": "요일별 기본 일과 (Beoms_2nd_Life 엑셀의 Bucket lists 시트). 조언은 이 리듬 위에 오늘 할 일을 얹습니다.",
   "history": {
     "claude_code_projects_dir": "~/.claude/projects",
     "claude_ai_export": "",
@@ -21,23 +509,70 @@
     "stats_days": 30,
     "max_history_chars": 45000
   },
-
-  "context_dirs": ["./context"],
+  "context_dirs": [
+    "./context"
+  ],
   "context_help": "여기에 .md / .txt / .docx 파일을 넣으면 매일 조언에 반영됩니다. (파일당 최대 12,000자)",
-
-  "journal_dirs": ["~/Downloads", "~/OnMoment/morning/returns"],
+  "journal_dirs": [
+    "~/Downloads",
+    "~/OnMoment/morning/returns"
+  ],
   "journal_help": "대시보드의 '오늘 밤 Return' 저장 버튼으로 받은 onmoment-return-*.md 파일을 다음 날 아침 읽어옵니다.",
-
   "milestones": [
-    { "title": "13주 클로즈드 베타 (40테이블·7,194건)", "date": "2026-08-31", "status": "done", "track": "build" },
-    { "title": "모두의창업 v2 최종본 제출", "date": null, "status": "done", "track": "build" },
-    { "title": "변리사 상담 · IP Map (유튜브 공개 전)", "date": null, "status": "now", "track": "build" },
-    { "title": "Creator OS Phase 0 — 정본 세팅 1주", "date": null, "status": "now", "track": "content" },
-    { "title": "1R 50명 코호트 시작 (Insight 20% 검증)", "date": null, "status": "next", "track": "build" },
-    { "title": "Creator OS Phase 1 — 비공개 4편", "date": null, "status": "next", "track": "content" },
-    { "title": "법인 설립 · IP 이전/라이선스", "date": null, "status": "next", "track": "build" },
-    { "title": "기관 유료 파일럿 1건 (30명+)", "date": null, "status": "next", "track": "build" },
-    { "title": "공개 Pilot 8주 (Long 8 + Shorts 12~16)", "date": null, "status": "next", "track": "content" }
+    {
+      "title": "13주 클로즈드 베타 (40테이블·7,194건)",
+      "date": "2026-08-31",
+      "status": "done",
+      "track": "build"
+    },
+    {
+      "title": "모두의창업 v2 최종본 제출",
+      "date": null,
+      "status": "done",
+      "track": "build"
+    },
+    {
+      "title": "변리사 상담 · IP Map (유튜브 공개 전)",
+      "date": null,
+      "status": "now",
+      "track": "build"
+    },
+    {
+      "title": "Creator OS Phase 0 — 정본 세팅 1주",
+      "date": null,
+      "status": "now",
+      "track": "content"
+    },
+    {
+      "title": "1R 50명 코호트 시작 (Insight 20% 검증)",
+      "date": null,
+      "status": "next",
+      "track": "build"
+    },
+    {
+      "title": "Creator OS Phase 1 — 비공개 4편",
+      "date": null,
+      "status": "next",
+      "track": "content"
+    },
+    {
+      "title": "법인 설립 · IP 이전/라이선스",
+      "date": null,
+      "status": "next",
+      "track": "build"
+    },
+    {
+      "title": "기관 유료 파일럿 1건 (30명+)",
+      "date": null,
+      "status": "next",
+      "track": "build"
+    },
+    {
+      "title": "공개 Pilot 8주 (Long 8 + Shorts 12~16)",
+      "date": null,
+      "status": "next",
+      "track": "content"
+    }
   ],
   "milestones_help": "date 에 'YYYY-MM-DD'를 넣으면 대시보드에 D-day가 표시됩니다. status: done | now | next"
 }

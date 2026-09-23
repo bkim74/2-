@@ -76,6 +76,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
   body {
@@ -90,7 +91,7 @@
     padding-inline: 16px;
     padding-block: 20px 64px;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
   button, input, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
   :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
@@ -98,6 +99,10 @@
   .label { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
   .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .section-head h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; font-weight: 500; white-space: nowrap; }
+  .tag-life { color: var(--life); } .tag-build { color: var(--build); } .tag-content { color: var(--content); } .tag-claude { color: var(--claude); } .tag-rest { color: var(--rest); }
 
   /* ---------- status banner ---------- */
   .banner { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between;
@@ -110,257 +115,186 @@
     animation: pulse 1.4s ease-in-out infinite; vertical-align: 1px; }
   @keyframes pulse { 50% { opacity: .25; } }
 
-  /* ---------- sky hero ---------- */
-  .sky {
-    position: relative; overflow: hidden;
-    border-radius: 20px; border: 1px solid var(--line);
-    background: var(--sky, linear-gradient(180deg, rgba(122, 132, 196, 0.22), rgba(236, 160, 96, 0.26))), var(--surface);
-    padding: 26px 26px 10px;
-    display: grid; gap: 14px;
-  }
+  /* ---------- 1. sky hero ---------- */
+  .sky { border-radius: 20px; border: 1px solid var(--line); padding: 24px 26px 8px; display: grid; gap: 12px;
+    background: var(--sky, linear-gradient(180deg, rgba(122, 132, 196, 0.22), rgba(236, 160, 96, 0.26))), var(--surface); }
   .sky-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
   .date { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
   .theme-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 12.5px; color: var(--ink-2); }
-  .greeting { font-size: 16px; color: var(--ink-2); max-width: 62ch; margin: 0; }
-  .one-line {
-    font-family: var(--serif); font-weight: 500; font-size: clamp(28px, 4.6vw, 48px); line-height: 1.3;
-    letter-spacing: -0.01em; max-width: 22ch;
-  }
+  .one-line { font-family: var(--serif); font-weight: 500; font-size: clamp(28px, 4.6vw, 46px); line-height: 1.3; letter-spacing: -0.01em; max-width: 22ch; }
   .one-line::before { content: "“"; color: var(--amber); margin-right: 2px; }
   .one-line::after { content: "”"; color: var(--amber); margin-left: 2px; }
-  .horizon { width: 100%; height: auto; display: block; margin-top: 4px; }
+  .greeting { font-size: 15.5px; color: var(--ink-2); max-width: 64ch; margin: 0; }
+  .horizon { width: 100%; height: auto; display: block; }
   .horizon text { font-family: var(--mono); font-size: 13px; fill: var(--muted); }
-  .sky-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); padding-bottom: 10px; }
+  .sky-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); padding-bottom: 10px; }
   .sky-meta b { color: var(--ink); font-weight: 600; }
 
-  /* ---------- 3-line card ---------- */
-  .card-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; }
-  .three { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; display: grid; gap: 4px; }
-  .three-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
-  .three-head h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; }
-  .line3 { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 14px 0; border-top: 1px dashed var(--line); align-items: start; }
-  .line3:first-of-type { border-top: 0; }
-  .line3 .k { font-family: var(--serif); font-weight: 700; font-size: 15px; padding-top: 2px; }
-  .line3[data-k="reality"] .k { color: var(--rest); }
-  .line3[data-k="wish"] .k { color: var(--life); }
-  .line3[data-k="choice"] .k { color: var(--amber); }
-  .line3 .v { font-size: 17px; line-height: 1.65; border-radius: 6px; padding: 2px 6px; margin: -2px -6px; }
-  .line3 .v:hover { background: var(--surface-2); }
-  .line3 .v:focus { background: var(--surface-2); outline: 1px solid var(--line); }
-  .hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
-  .return-q { display: grid; gap: 12px; align-content: start; }
-  .return-q blockquote { margin: 0; font-family: var(--serif); font-size: 19px; line-height: 1.6; }
-  .focus-list { display: grid; gap: 10px; margin: 0; }
-  .focus-list div { display: grid; gap: 2px; }
-  .focus-list dt { font-size: 12.5px; color: var(--muted); }
-  .focus-list dd { margin: 0; font-weight: 500; }
+  /* ---------- 2. today ---------- */
+  .row-2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .line3 { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px dashed var(--line); }
+  .line3:first-of-type { border-top: 0; padding-top: 0; }
+  .line3 .k { font-family: var(--serif); font-weight: 700; font-size: 15px; padding-top: 1px; }
+  .line3[data-k="reality"] .k { color: var(--rest); } .line3[data-k="wish"] .k { color: var(--life); } .line3[data-k="choice"] .k { color: var(--amber); }
+  .line3 .v { font-size: 16.5px; line-height: 1.65; border-radius: 6px; padding: 2px 6px; margin: -2px -6px; }
+  .line3 .v:hover, .line3 .v:focus { background: var(--surface-2); outline: 1px solid var(--line); }
+  .ret { margin: 14px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--surface-2); font-size: 14.5px; color: var(--ink-2); }
+  .ret b { color: var(--ink); font-weight: 600; }
+  .todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .todo label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; cursor: pointer;
+    padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  .todo input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--amber); }
+  .todo .t { font-weight: 600; font-size: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .todo .w { font-size: 13.5px; color: var(--muted); display: block; margin-top: 2px; }
+  .todo li.checked label { background: var(--surface-2); }
+  .todo li.checked .t span:first-child { text-decoration: line-through; color: var(--muted); }
 
-  /* ---------- day + side ---------- */
-  .grid-2 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-  .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
-  .section-head h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; }
+  /* ---------- 3. flow + gates ---------- */
   .plan { list-style: none; margin: 0; padding: 0; display: grid; }
-  .plan li { display: grid; grid-template-columns: 92px 18px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); align-items: start; }
+  .plan li { display: grid; grid-template-columns: 96px 18px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
   .plan li:first-child { border-top: 0; }
-  .plan .t { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
-  .plan input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--amber); }
+  .plan .tm { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
+  .plan input { width: 17px; height: 17px; margin-top: 4px; accent-color: var(--amber); }
   .plan .ttl { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-  .plan .det { color: var(--ink-2); font-size: 14.5px; margin-top: 2px; }
+  .plan .det { color: var(--ink-2); font-size: 14.5px; }
   .plan li.is-now { background: var(--amber-soft); border-radius: 10px; padding-inline: 10px; margin-inline: -10px; border-top-color: transparent; }
   .plan li.is-now + li { border-top-color: transparent; }
-  .plan li.checked .ttl span:first-child, .plan li.checked .det { text-decoration: line-through; text-decoration-color: var(--muted); color: var(--muted); }
-  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; font-weight: 500; white-space: nowrap; }
-  .tag-life { color: var(--life); } .tag-build { color: var(--build); } .tag-content { color: var(--content); } .tag-claude { color: var(--claude); } .tag-rest { color: var(--rest); }
-  .side { display: grid; gap: 20px; }
-  .gates { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
-  .gates li { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 9px 0; position: relative; }
-  .gates li::before { content: ""; position: absolute; left: 7px; top: 24px; bottom: -10px; width: 2px; background: var(--line); }
+  .plan li.checked .ttl span:first-child, .plan li.checked .det { text-decoration: line-through; color: var(--muted); }
+  .gates { list-style: none; margin: 0; padding: 0; display: grid; }
+  .gates li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 8px 0; position: relative; }
+  .gates li::before { content: ""; position: absolute; left: 6px; top: 24px; bottom: -8px; width: 2px; background: var(--line); }
   .gates li:last-child::before { display: none; }
-  .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); margin-top: 4px; position: relative; z-index: 1; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); margin-top: 5px; position: relative; z-index: 1; }
   .gates li[data-s="done"] .dot { background: var(--done); border-color: var(--done); }
   .gates li[data-s="now"] .dot { border-color: var(--now); box-shadow: 0 0 0 4px var(--amber-soft); }
   .gates li[data-s="done"] .g-title { color: var(--muted); }
   .gates li[data-s="now"] .g-title { font-weight: 600; }
   .g-title { font-size: 14.5px; line-height: 1.5; }
-  .g-sub { font-size: 12px; color: var(--muted); display: block; }
-  .dday { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; padding-top: 2px; white-space: nowrap; }
+  .dday { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; padding-top: 2px; white-space: nowrap; color: var(--muted); }
   .dday.soon { color: var(--amber); font-weight: 500; }
-  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .tile { display: grid; gap: 2px; }
-  .tile .n { font-family: var(--mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.2; }
-  .tile .l { font-size: 12px; color: var(--muted); }
-  .spark { width: 100%; height: auto; display: block; margin-top: 14px; }
-  .spark text { font-family: var(--mono); font-size: 10px; fill: var(--muted); }
-  .hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; align-items: end; height: 44px; margin-top: 6px; }
-  .hours span { background: var(--build); opacity: 0.8; border-radius: 2px 2px 0 0; min-height: 2px; }
-  .hours-axis { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); }
-  .tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .tools span { font-family: var(--mono); font-size: 11.5px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; color: var(--ink-2); }
-  .sub-h { font-size: 13px; font-weight: 600; margin: 18px 0 0; color: var(--ink-2); }
 
-  /* ---------- chapters ---------- */
-  .read { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
-  .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 4px; }
-  .toc a { display: grid; gap: 0; padding: 8px 12px; border-radius: 10px; color: var(--ink-2); text-decoration: none; font-size: 14px; border-left: 3px solid transparent; }
-  .toc a:hover { background: var(--surface); }
-  .toc a.active { background: var(--surface); border-left-color: var(--amber); color: var(--ink); }
-  .toc small { font-family: var(--mono); font-size: 10.5px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
-  .progress { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; margin: 8px 12px 0; }
-  .progress i { display: block; height: 100%; width: 0; background: var(--amber); transition: width 0.2s; }
-  .chapters { display: grid; gap: 22px; }
-  .chapter { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(22px, 3.5vw, 40px); scroll-margin-top: 16px; }
-  .chapter header { display: grid; gap: 8px; margin-bottom: 18px; }
-  .chapter h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(22px, 2.8vw, 30px); line-height: 1.35; }
-  .evidence { margin: 0 0 22px; padding: 14px 16px; background: var(--surface-2); border-radius: 10px; font-size: 14px; color: var(--ink-2); display: grid; gap: 4px; }
-  .evidence .label { font-size: 10.5px; }
-  .prose { max-width: 66ch; font-size: 16.5px; line-height: 1.85; }
-  .prose p { margin: 0 0 1.05em; }
-  .prose h3 { font-family: var(--serif); font-weight: 700; font-size: 18px; margin: 1.6em 0 0.5em; }
-  .prose ul, .prose ol { margin: 0 0 1.05em; padding-left: 1.3em; }
+  /* ---------- 4. radar ---------- */
+  .radar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .col { display: grid; gap: 10px; align-content: start; }
+  .col h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+  .col h3 .n { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 400; }
+  .item { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--surface); display: grid; gap: 6px; }
+  .item .top { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+  .item b { font-size: 15px; font-weight: 600; line-height: 1.45; }
+  .item .org { font-size: 12.5px; color: var(--muted); }
+  .item p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+  .item .act { font-size: 13.5px; color: var(--ink); }
+  .item .act::before { content: "→ "; color: var(--amber); }
+  .item a { justify-self: start; font-size: 13px; color: var(--build); text-decoration: none; border-bottom: 1px solid currentColor; }
+  .item a:hover { color: var(--amber); }
+  .when { font-family: var(--mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; white-space: nowrap; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+  .when.hot { background: var(--amber-soft); color: var(--amber); border-color: var(--amber); }
+  .radar-empty { font-size: 13.5px; color: var(--muted); padding: 12px 0; }
+
+  /* ---------- 5. advice tabs ---------- */
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .tab { border: 0; background: transparent; padding: 10px 14px; border-bottom: 3px solid transparent; color: var(--muted); font-size: 15px; white-space: nowrap; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--amber); font-weight: 600; }
+  .chapter h3.ch-title { font-family: var(--serif); font-weight: 500; font-size: clamp(21px, 2.6vw, 27px); line-height: 1.4; margin-bottom: 14px; }
+  .evidence { margin: 0 0 20px; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; font-size: 13.5px; color: var(--ink-2); }
+  .prose { max-width: 68ch; font-size: 16.5px; line-height: 1.85; }
+  .prose p { margin: 0 0 1em; }
+  .prose h3 { font-family: var(--serif); font-weight: 700; font-size: 18px; margin: 1.5em 0 0.5em; }
+  .prose ul, .prose ol { margin: 0 0 1em; padding-left: 1.3em; }
   .prose li { margin: 0.3em 0; }
-  .prose blockquote { margin: 1.2em 0; padding: 2px 0 2px 16px; border-left: 2px solid var(--amber); font-family: var(--serif); font-size: 17.5px; color: var(--ink); }
+  .prose blockquote { margin: 1.2em 0; padding: 2px 0 2px 16px; border-left: 2px solid var(--amber); font-family: var(--serif); font-size: 17.5px; }
   .prose strong { font-weight: 600; background: linear-gradient(transparent 62%, var(--amber-soft) 62%); }
   .prose code { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); border: 1px solid var(--line); padding: 0 5px; border-radius: 5px; }
-  .actions { list-style: none; margin: 24px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); display: grid; gap: 8px; }
-  .actions li label { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; cursor: pointer; font-size: 15px; }
+  .actions { list-style: none; margin: 22px 0 0; padding: 16px 0 0; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+  .actions label { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; cursor: pointer; font-size: 15px; }
   .actions input { width: 17px; height: 17px; margin-top: 5px; accent-color: var(--amber); }
   .actions li.checked span { color: var(--muted); text-decoration: line-through; }
-
-  /* ---------- claude tips ---------- */
-  .tips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .tip { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; align-content: start; }
-  .tip h3 { font-size: 17px; font-weight: 600; }
-  .tip .why { font-size: 13.5px; color: var(--muted); margin: 0; }
-  .tip .how { font-size: 14.5px; margin: 0; color: var(--ink-2); }
-  .prompt-box { position: relative; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; color: var(--ink); }
-  .copy { justify-self: start; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 12px; font-size: 13px; color: var(--ink-2); }
-  .copy:hover { border-color: var(--amber); color: var(--ink); }
-
-  /* ---------- content mission ---------- */
-  .mission { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
-  .mission .q { font-family: var(--serif); font-size: clamp(20px, 2.4vw, 26px); line-height: 1.45; margin: 6px 0 14px; }
+  .extra { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); display: grid; gap: 14px; }
+  .extra h4 { margin: 0; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  .tips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .tip { border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+  .tip b { font-size: 15.5px; }
+  .tip p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .prompt-box { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; margin: 0; }
+  .copy { justify-self: start; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 3px 12px; font-size: 13px; color: var(--ink-2); }
   .shots { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-  .shot { border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; display: grid; gap: 6px; align-content: start; cursor: pointer; background: var(--surface); transition: border-color 0.15s, background 0.15s; min-height: 120px; }
+  .shot { border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: grid; gap: 4px; align-content: start; cursor: pointer; min-height: 104px; }
   .shot b { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em; }
   .shot span { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
   .shot input { position: absolute; opacity: 0; pointer-events: none; }
-  .shot.on { border-color: var(--content); background: color-mix(in srgb, var(--content) 10%, var(--surface)); }
+  .shot.on { border-color: var(--content); background: var(--surface-2); }
   .shot.on b::after { content: " ✓"; color: var(--content); }
-  .memo { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; color: var(--ink-2); font-size: 15px; }
-  .seed { margin-top: 16px; padding: 12px 14px; border: 1px dashed var(--content); border-radius: 10px; font-size: 14.5px; }
+  .plain { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; color: var(--ink-2); font-size: 15px; }
+  .q { font-family: var(--serif); font-size: 20px; line-height: 1.5; margin: 0; }
 
-  /* ---------- watch + evening ---------- */
-  .watch { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .watch li { padding-left: 18px; position: relative; font-size: 15px; color: var(--ink-2); }
-  .watch li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 8px; height: 2px; background: var(--amber); }
-  .evening { display: grid; gap: 16px; }
+  /* ---------- 6. evening ---------- */
+  .evening { display: grid; gap: 14px; }
   .evening label { display: grid; gap: 6px; font-family: var(--serif); font-size: 16.5px; }
-  .evening textarea { font-family: var(--sans); font-size: 15px; min-height: 76px; resize: vertical; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .evening textarea { font-family: var(--sans); font-size: 15px; min-height: 70px; resize: vertical; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
   .row-btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .btn { border: 1px solid var(--ink); background: var(--ink); color: var(--surface); border-radius: 10px; padding: 8px 16px; font-weight: 500; font-size: 14px; }
   .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
   .status { font-size: 13px; color: var(--muted); }
-  footer { text-align: center; font-size: 12.5px; color: var(--muted); padding-top: 8px; display: grid; gap: 2px; }
+  footer { text-align: center; font-size: 12.5px; color: var(--muted); display: grid; gap: 2px; }
 
   @media (max-width: 920px) {
-    .card-row, .grid-2, .mission { grid-template-columns: minmax(0, 1fr); }
-    .read { grid-template-columns: minmax(0, 1fr); }
-    .toc { position: static; grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; padding-bottom: 4px; }
-    .toc a { border-left: 0; border-bottom: 3px solid transparent; }
-    .toc a.active { border-bottom-color: var(--amber); }
-    .progress { display: none; }
+    .row-2, .radar { grid-template-columns: minmax(0, 1fr); }
     .tips { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 560px) {
     body { font-size: 15.5px; }
     .sky { padding: 20px 18px 6px; }
     .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .plan li { grid-template-columns: 70px 18px minmax(0, 1fr); gap: 8px; }
-    .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-    .tile .n { font-size: 20px; }
-    .line3 { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .plan li { grid-template-columns: 74px 18px minmax(0, 1fr); gap: 8px; }
+    .line3 { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
+<div class="wrap">
   <div class="banner" id="banner" role="status" hidden></div>
+
   <section class="sky" id="sky" aria-label="오늘">
-    <div class="sky-top">
-      <span class="date" id="date"></span>
-      <button class="theme-btn" id="themeBtn" type="button">테마</button>
-    </div>
-    <p class="greeting" id="greeting"></p>
+    <div class="sky-top"><span class="date" id="date"></span><button class="theme-btn" id="themeBtn" type="button">테마</button></div>
     <h1 class="one-line" id="oneLine"></h1>
-    <svg class="horizon" id="horizon" viewBox="0 0 1000 170" role="img" aria-label="오늘 하루의 흐름과 지금 시각"></svg>
+    <p class="greeting" id="greeting"></p>
+    <svg class="horizon" id="horizon" viewBox="0 0 1000 150" role="img" aria-label="오늘 하루의 흐름과 지금 시각"></svg>
     <div class="sky-meta" id="skyMeta"></div>
   </section>
 
-  <section class="card-row">
-    <article class="three" aria-labelledby="threeTitle">
-      <div class="three-head">
-        <h2 id="threeTitle">오늘의 3줄</h2>
-        <span class="label">A · B · Bridge</span>
-      </div>
+  <section class="row-2" aria-label="오늘">
+    <article class="panel">
+      <div class="section-head"><h2>오늘의 3줄</h2><span class="label">고쳐 쓰면 저장됩니다</span></div>
       <div class="line3" data-k="reality"><span class="k">현재</span><div class="v" id="l-reality" contenteditable="true" spellcheck="false"></div></div>
       <div class="line3" data-k="wish"><span class="k">바람</span><div class="v" id="l-wish" contenteditable="true" spellcheck="false"></div></div>
       <div class="line3" data-k="choice"><span class="k">선택</span><div class="v" id="l-choice" contenteditable="true" spellcheck="false"></div></div>
-      <p class="hint">AI가 비춘 초안입니다. 범님의 말로 고쳐 쓰면 이 컴퓨터에 저장되고, 밤 Return에 함께 담깁니다.</p>
+      <p class="ret" id="ret"></p>
     </article>
-    <aside class="panel return-q">
-      <span class="label">어제로부터의 Return</span>
-      <blockquote id="returnQ"></blockquote>
-      <dl class="focus-list" id="buildFocus"></dl>
-    </aside>
+    <article class="panel">
+      <div class="section-head"><h2>오늘 꼭 할 3가지</h2><span class="label num" id="todoCount"></span></div>
+      <ul class="todo" id="todo"></ul>
+    </article>
   </section>
 
-  <section class="grid-2">
+  <section class="row-2">
     <div class="panel">
       <div class="section-head"><h2>오늘의 흐름</h2><span class="label num" id="planCount"></span></div>
       <ol class="plan" id="plan"></ol>
     </div>
-    <div class="side">
-      <div class="panel">
-        <div class="section-head"><h2>게이트</h2><span class="label">모두의창업 · Creator OS</span></div>
-        <ul class="gates" id="gates"></ul>
-      </div>
-      <div class="panel">
-        <div class="section-head"><h2>Claude와 보낸 시간</h2><span class="label" id="statsRange"></span></div>
-        <div class="tiles" id="tiles"></div>
-        <svg class="spark" id="spark" viewBox="0 0 320 78" role="img" aria-label="최근 14일 Claude Code 메시지 수"></svg>
-        <p class="sub-h">어느 시간에 일하나요</p>
-        <div class="hours" id="hours" aria-label="시간대별 메시지 수"></div>
-        <div class="hours-axis"><span>0시</span><span>6</span><span>12</span><span>18</span><span>23</span></div>
-        <div class="tools" id="tools"></div>
-      </div>
+    <div class="panel">
+      <div class="section-head"><h2>게이트</h2><span class="label">모두의창업 · Creator OS</span></div>
+      <ul class="gates" id="gates"></ul>
     </div>
   </section>
 
-  <section class="read" aria-label="오늘의 조언">
-    <nav class="toc" id="toc" aria-label="장 목록"></nav>
-    <div class="chapters" id="chapters"></div>
+  <section class="panel" aria-labelledby="radarTitle">
+    <div class="section-head"><h2 id="radarTitle">레이더 · 오늘 찾아온 기회</h2><span class="label" id="radarMeta"></span></div>
+    <div class="radar" id="radar"></div>
   </section>
 
-  <section>
-    <div class="section-head"><h2>Claude Code, 오늘 이렇게 써 보세요</h2><span class="label">복사해서 바로 붙여넣기</span></div>
-    <div class="tips" id="tips"></div>
-  </section>
-
-  <section class="panel">
-    <div class="mission">
-      <div>
-        <span class="label">오늘 품고 다닐 질문 · Capture lightly</span>
-        <p class="q" id="missionQ"></p>
-        <ul class="shots" id="shots"></ul>
-        <div class="seed" id="seed"></div>
-      </div>
-      <div>
-        <span class="label">경험 10~30분 뒤 · 30~60초 Voice Memo</span>
-        <ol class="memo" id="memo" style="margin-top:10px"></ol>
-        <p class="sub-h" style="margin-top:22px">오늘 조심할 패턴</p>
-        <ul class="watch" id="watch" style="margin-top:8px"></ul>
-      </div>
-    </div>
+  <section class="panel" aria-label="오늘의 조언">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="chapter"></div>
   </section>
 
   <section class="panel" aria-labelledby="eveningTitle">
@@ -372,7 +306,7 @@
 </div>
 
 <script>
-const BRIEF = {"greeting": "범님, 좋은 아침입니다. 지난 18일 하루를 꼬박 들여 온순간의 North Star를 다시 세우셨고, 그 끝에 스스로 이렇게 정리하셨죠. '대화를 통째로 넣고 구현하라고 하지 않는다.' 오늘은 그 문장이 제품이 아니라 범님의 하루에 먼저 적용되는 날이면 좋겠습니다.", "one_line": "장면이 먼저, 의미는 나중.", "return_question": "18일에 세운 North Star 문장들 가운데, 이번 주에 실제로 한 번이라도 살아본 문장이 있었나요? 떠오르지 않는다면 그것도 있는 그대로의 Evidence입니다.", "three_lines": {"reality": "철학·설계·신청서는 충분히 깊어졌다. 지금 부족한 것은 더 많은 문장이 아니라, 실제로 살아낸 장면이다.", "wish": "상대를 고치기 전에 제대로 만나는 나 — 아들 앞에서도, 아내 앞에서도, 1R의 50명 앞에서도.", "choice": "오늘 누군가 말을 시작하면, 첫 60초는 답하지 않고 듣는다."}, "day_plan": [{"time": "06:00", "end": "06:20", "title": "이 창을 열고, 3줄만 내 말로", "detail": "끝까지 읽지 않아도 됩니다. 3줄 카드를 범님의 말로 고치고, 오늘의 질문 하나만 휴대폰 메모에 옮깁니다.", "tag": "life"}, {"time": "06:20", "end": "07:00", "title": "걷기와 기도", "detail": "휴대폰은 주머니에. Pocket 4P는 챙기되 Moment가 걸릴 때만 꺼냅니다.", "tag": "life"}, {"time": "07:00", "end": "07:40", "title": "가족 아침", "detail": "조언 대신 질문 하나. 누군가 말을 시작하면 오늘의 선택, 첫 60초 듣기.", "tag": "rest"}, {"time": "08:30", "end": "10:00", "title": "딥워크 · 'Insight'를 무엇으로 셀지 정의", "detail": "1R 50명의 핵심 지표 정의 1페이지. 베타 카드 20장을 직접 분류해 보며 포함/제외 예시 각 3개.", "tag": "build"}, {"time": "10:15", "end": "11:15", "title": "Claude Code · 작은 단위 하나", "detail": "Founder Direction 전달 1회분만. plan mode로 기존 코드·DB와 대조한 뒤 PR 한 개로 끝냅니다.", "tag": "claude"}, {"time": "11:15", "end": "12:00", "title": "변리사 상담 질문 5개", "detail": "유튜브·커뮤니티에 A-B-Bridge 구조를 공개하기 전에 확인할 것만. 결정 직전 멘토링 요청서 초안까지.", "tag": "build"}, {"time": "12:00", "end": "13:30", "title": "점심과 죄책감 없는 쉼", "detail": "'쉬러 와서도 뭔가 해야 하는' 느낌이 올라오면 그 순간을 조각으로 한 줄 남깁니다.", "tag": "rest"}, {"time": "14:00", "end": "15:30", "title": "기관 파이프라인 3곳", "detail": "후보 기관마다 '담당자의 다음 행동' 하나를 적고, 그중 한 곳에 오늘 연락합니다.", "tag": "build"}, {"time": "15:30", "end": "16:30", "title": "Creator OS Phase 0", "detail": "촬영 헌법·5-shot·파일 규칙을 A4 한 장으로. 장비 세팅은 20분을 넘기지 않습니다.", "tag": "content"}, {"time": "18:00", "end": "20:00", "title": "가족 저녁과 산책", "detail": "촬영보다 먼저 삽니다. 걸린 장면이 있으면 10~30분 뒤 60초 Voice Memo.", "tag": "life"}, {"time": "22:00", "end": "22:15", "title": "밤 3분 Return, 그리고 끄기", "detail": "아래 Return 칸을 채우고 저장합니다. 22시 이후엔 새 Claude 세션을 열지 않습니다.", "tag": "life"}], "build_focus": {"gate": "1단계 · 1R 50명 코호트 (자기 언어 Insight 20%)", "today_task": "'자기 언어 Insight'를 무엇으로 셀지 정의한 1페이지 — 실제 베타 카드로 포함/제외 예시 각 3개", "metric": "베타 카드 20장을 이 정의로 직접 분류했고, 애매한 카드가 몇 장인지 숫자로 적었다"}, "content_mission": {"question": "나는 오늘 누구의 말을 끝까지 들었나?", "shots": [{"key": "WHERE", "hint": "아침 걷는 길의 첫 장면. 20mm로 공간 전체를."}, {"key": "MOVE", "hint": "걷는 발, 계단, 차창. 5초면 충분합니다."}, {"key": "DETAIL", "hint": "식탁 위의 손, 컵, 노트에 적은 3줄. 60mm로 가까이."}, {"key": "HUMAN", "hint": "말하는 사람의 손과 뒷모습. 얼굴 대신 몸짓. 동의가 먼저입니다."}, {"key": "EVIDENCE", "hint": "60초 듣기를 해 본 뒤의 장면. 못 했다면 그 순간을 솔직하게 말한 음성 한 줄."}], "voice_memo": ["방금 무슨 일이 있었나?", "예상과 무엇이 달랐나?", "내게 뭐가 걸렸나?"], "episode_seed": "[오늘 한번 살아봤습니다] 말을 끊지 않고 60초 듣기 → D+7에 [그 뒤 어떻게 됐을까?]로 돌아오기. 비공개 Phase 1의 첫 편 후보."}, "chapters": [{"id": "life", "kicker": "온순간을 산다", "title": "창업자가 자기 제품의 첫 유저가 되는 하루", "evidence": "9/18 Founder Direction: 'Founder는 온순간의 첫 번째 Storydoer다' · 베타 13주: 자기 언어 Insight 도달 14명 중 1명(7%)", "body_md": "18일의 Founder Direction에서 가장 무거운 문장은 아마 이것이었습니다. **Founder는 온순간의 첫 번째 Storydoer다.** 그리고 13주 베타가 돌려준 가장 정직한 숫자는 이것이었고요. 자기 언어의 Insight에 닿은 사람은 14명 중 1명, 7%였습니다. 원인은 이미 정리하셨습니다. 긴 AI 해석이 '내 말'과 다음 선택으로 이어지지 않았다는 것.\n\n오늘은 이 두 문장을 나란히 놓아 보시면 좋겠습니다. 판정하려는 게 아니라 비춰 보려는 겁니다. 범님은 생각이 깊고 빠른 분입니다. 한 장면에서 삶의 원리를 곧바로 길어 올리고, 그것을 몇 시간이고 문서로 넓혀 갈 수 있습니다. 그 힘이 온순간을 여기까지 데려왔습니다. 다만 Creator OS 브리프에서 범님 스스로 적어 두셨듯, **의미를 너무 빨리 발견하는 것은 장점이면서 위험입니다.** 긴 해석이 유저의 '내 말'을 가리듯, 범님의 긴 해석도 범님 자신의 '오늘 한 번'을 가릴 수 있습니다.\n\n### 가능성 두 가지 (가설입니다)\n- 하나. 온순간이 유저에게 주려는 것, 곧 짧은 조각과 한 문장과 작은 선택을 범님이 먼저 매일 쓰지 않으면, 제품의 병목과 창업자의 병목이 같은 모양으로 남을 수 있습니다.\n- 둘. 반대로 범님이 오늘 한 번 짧게 살아 보면, 그 체감이 1R 넛지 설계의 가장 정확한 데이터가 될 수 있습니다. 어떤 질문에서 손이 멈췄는지, 어떤 문장이 내 말처럼 느껴졌는지.\n\n어느 쪽이 맞는지는 범님이 정합니다. 오늘 제안은 하나뿐입니다. 온순간의 Daily UX를 그대로 범님의 하루에 적용해 보는 것입니다. **[조각] 지금 남기고 싶은 것은? → [한 문장] 이 순간에서 놓치고 싶지 않은 것은?** 여기서 끝나도 정상입니다. 필요할 때만 [오늘 한 번], 실제로 했을 때만 [살아보니].\n\n### 오늘의 관계 장면\n범님이 적어 둔 Journey가 있습니다. '사람을 고치기 전에 제대로 만나는 삶.' 그 아래 네 개의 thread가 있었죠. 말을 끝까지 기다리는 아빠, 갈등 중에도 같은 편에 남는 남편, 재촉하지 않고 듣는 아들, 답하기 전에 상대가 본 문제를 먼저 묻는 동료. 오늘은 이 가운데 하나만 고르면 됩니다. 저라면 오늘 가장 먼저 말을 걸어올 사람을 고르겠습니다. Right Moment는 계획보다 그 사람이 입을 여는 순간에 더 가깝기 때문입니다.\n\n> 오늘 누군가 말을 시작하면, 첫 60초는 답하지 않고 듣는다.\n\n못 해도 괜찮습니다. 온순간에서 실패는 판정이 아니라 다음 Evidence입니다. 밤에 '몇 초쯤에서 입을 열었는지'만 적어 두면, 그게 내일 아침의 A가 됩니다.", "actions": ["3줄 카드의 '선택'을 범님의 말로 고쳐 쓰기", "오늘 한 사람 앞에서 첫 60초 듣기 (몇 초에서 입을 열었는지만 기억)", "[조각] 한 줄 + [한 문장] 한 줄로 오늘을 남기기 — 더 쓰고 싶어도 거기서 멈추기"]}, {"id": "build", "kicker": "비즈니스 빌드업", "title": "지금 통과할 게이트는 하나: 1R 50명과 Insight 20%", "evidence": "모두의창업 v2: '일정표를 통과 기준이 있는 게이트로 바꿨습니다' · 멘토링 요청 ①: '공개·실증이 신규성에 영향을 줄 수 있으므로'", "body_md": "모두의창업 v2에서 가장 잘 하신 일은 일정표를 **통과 기준이 있는 게이트**로 바꾼 것입니다. 게이트 방식의 장점은 오늘 해야 할 일이 저절로 좁혀진다는 데 있습니다. 지금 게이트는 하나, 1R 50명 코호트에서 자기 언어 Insight 20%를 검증하는 것입니다. 기관 파일럿, 선물 경제, 소셜벤처 판별은 모두 이 게이트 뒤에 있습니다.\n\n### 1. 'Insight'를 먼저 셀 수 있게 만드세요\n20%라는 목표보다 앞서야 할 것은 무엇을 1로 셀지입니다. 베타의 7%가 어떤 정의로 나온 숫자인지, 1R에서도 같은 정의를 쓸지부터 적어 두시길 권합니다. 예를 들면 이렇습니다.\n- **포함:** 유저가 AI 비춤을 받은 뒤, AI 문장을 복사하지 않고 자기 단어로 쓴 '한 문장'이 있고, 그것이 이전 기록과 다른 관점을 담고 있다.\n- **제외:** AI 문장을 그대로 수락한 경우, 감정 표현만 있고 관점 변화가 없는 경우.\n- **애매:** 따로 표시하고 숫자로 셉니다. 애매한 비율이 높다면 정의보다 UX가 문제일 수 있습니다.\n\n베타 카드 20장을 이 기준으로 직접 분류해 보세요. 한 시간이면 됩니다. 분류가 흔들리는 지점이 곧 1R 넛지를 고칠 지점입니다. 이미 40개 테이블과 7,194건이 있으니 **새 테이블을 만들지 말고**, 원문과 AI 초안과 최종 문장의 차이를 기존 데이터에서 계산할 수 있는지부터 확인하시면 됩니다.\n\n### 2. 공개하기 전에 변리사를 먼저 만나세요\n오늘 가장 놓치기 쉬운 연결고리가 여기 있습니다. v2의 멘토링 요청 1번에 이미 적어 두셨습니다. **공개와 실증이 신규성에 영향을 줄 수 있다.** 그런데 Creator OS Phase 2는 공개 Pilot이고, 3줄 카드는 콘텐츠로도 그대로 읽힙니다. 유튜브에 A-B-Bridge 구조, Lived Evidence 기반 넛지, Storydoing→Return→Gift 흐름이 화면으로 나가는 순간이 곧 공개 시점일 수 있습니다. 그래서 순서는 이렇게 권합니다. **Phase 1 비공개 4편 → 변리사 상담과 IP Map → Phase 2 공개.** 비공개 4편을 먼저 만들자는 브리프의 설계가 IP 관점에서도 정확히 맞는 셈입니다.\n\n### 3. 기관 3곳에는 '담당자의 다음 행동' 하나씩\n후보 기관마다 한 줄씩만 적어 보세요. 그 기관 담당자가 다음 달에 해야 하는 보고는 무엇인가. 온순간의 기관 리포트가 그 보고의 한 페이지를 대신할 수 있다면, 그게 제안서의 첫 장입니다. 23년간 전략 파트너사를 설계해 오신 범님에게는 익숙한 일입니다. 매장 대신 기관, POS 대신 동의 범위의 집계 리포트로 바뀌었을 뿐입니다.\n\n### 4. 멘토 시간은 결정 직전에만\nv2에 쓰신 대로 멘토님의 시간은 결정 직전에만 요청하시면 됩니다. 그러려면 결정 메모 양식 하나가 필요합니다. **결정할 것 / 선택지 2~3개 / 근거 / 되돌리기 어려운 정도 / 마감일.** 첫 메모의 주제는 '공개 전 출원 범위'가 좋겠습니다.", "actions": ["Insight 정의 1페이지 작성 후 베타 카드 20장 직접 분류", "변리사에게 물을 '공개 전 출원 범위' 질문 5개 정리", "후보 기관 3곳의 '담당자 다음 행동' 한 줄씩, 1곳에 연락"]}, {"id": "content", "kicker": "콘텐츠 실행", "title": "매일 찍지 않는다, 오늘 한 장면만 목격한다", "evidence": "Creator OS 브리프: 'Phase 0 — 1주 정본 세팅', '매일 콘텐츠를 만들지 않는다. 매일 온순간을 살고 증거만 남긴다.'", "body_md": "Creator OS 브리프의 첫 문장으로 돌아가 봅니다. **나는 유튜브를 하기 위해 온순간을 사는 것이 아니다.** 이번 주에 할 일은 촬영이 아니라 Phase 0, 정본을 세팅하는 1주입니다. 영상을 한 편도 만들지 않아도 되는 주간이라는 뜻이기도 합니다.\n\n### Phase 0에 필요한 최소한\n- **촬영 헌법 한 장:** Experience First · No Re-enactment · No Manufactured Wisdom · No Forced Choice · Return Honestly. 거기에 '보여주지 않은 것은 해석하지 않는다'를 더하면 됩니다.\n- **5-shot 카드:** WHERE · MOVE · DETAIL · HUMAN · EVIDENCE. Pocket 4P 케이스에 붙여 둘 크기면 충분합니다.\n- **파일 규칙:** `20260923_장소_사람또는질문_shot번호`. 폴더는 `raw / voice / selects / episodes` 네 개로 시작합니다. 메타데이터는 나중에 AI가 채웁니다.\n- **동의 기준:** 가족도 동의 대상입니다. 아내와 아들에게 \"당신 얼굴은 찍지 않는다, 목소리는 물어보고 쓴다\"를 먼저 말해 두세요.\n\nAgent 10개는 지금 만들지 않습니다. 브리프에 쓰신 대로 **커스텀 개발은 반복 검증된 병목에만** 합니다. Phase 1에서 실제로 막히는 곳은 아마 둘일 겁니다. 음성을 텍스트로 옮기는 일, 그리고 몇 시간짜리 footage에서 장면을 찾는 일. 둘 다 기존 도구와 Claude Code 헤드리스 호출로 충분히 시작할 수 있습니다.\n\n### 오늘의 선택이 곧 첫 편이 될 수 있습니다\n오늘의 선택인 '첫 60초는 답하지 않고 듣기'는 그대로 **[오늘 한번 살아봤습니다]** 시리즈의 첫 편 씨앗입니다. 콘텐츠를 기획하지 않았는데 삶에서 콘텐츠가 생기는 구조, 브리프가 말한 Life → Story → Storydoing → Life가 바로 이것입니다. 오늘 해야 할 촬영은 딱 하나입니다. 듣기를 해 본 뒤, 또는 못 했던 순간 뒤에 10~30분을 기다렸다가 60초짜리 Voice Memo를 남기는 것.\n\n> 방금 무슨 일이 있었나? 예상과 무엇이 달랐나? 내게 뭐가 걸렸나?\n\n그 음성이 편집 때 가장 좋은 내레이션 원재료가 됩니다. 그리고 D+7에 다시 묻습니다. 정말 했는가? 7일 중 2일이었다면 제목은 이미 나와 있습니다. '7일 중 2일밖에 못 했습니다.' 시청자가 돌아오는 이유는 성공이 아니라 정직한 Return입니다.\n\n### 콘텐츠와 비즈니스가 만나는 곳\n3줄 카드는 유저에게는 자기코칭의 근거이고, 밖에서는 콘텐츠이고, 기관에는 변화의 근거입니다. 범님이 직접 만든 3줄 카드와 그 뒤의 Return이 쌓이면, 그 자체로 기관 제안서에 넣을 수 있는 1인칭 사례가 됩니다. 단, 공개는 IP 확인 뒤에 합니다.", "actions": ["촬영 헌법 + 5-shot + 파일 규칙을 A4 한 장으로", "아내·아들에게 촬영 원칙(얼굴 X, 목소리는 동의 후) 먼저 말하기", "60초 듣기 뒤 10~30분 기다렸다가 Voice Memo 1개"]}, {"id": "claude", "kicker": "Claude Code 마스터리", "title": "Claude Code를 '깊은 대화 상대'에서 '운영체제'로", "evidence": "9/18 정리: '대화를 통째로 넣고 구현해라고 하지 않는다 … 7번의 전달' · A0 점검: repo migration 파일 수와 live schema_migrations 기록 불일치", "body_md": "범님은 Claude Code를 대화 상대로 아주 깊이 쓰고 계십니다. 18일 하루의 정리만 해도 20만 자가 넘는 문서가 되었으니까요. 이제 필요한 전환은 Claude Code를 **깊은 대화 상대에서 반복 가능한 운영체제로** 바꾸는 일입니다. 범님이 이미 적어 두신 원칙, 즉 작게 나누기, 실제 데이터 먼저 검수하기, 기존 MVP 깨지 않기, 하나의 source of truth를 도구 쪽에서 강제하는 방법이 있습니다.\n\n### 1. CLAUDE.md는 짧게, 정본은 링크로\nCLAUDE.md에 철학을 다 넣으면 매 세션이 무거워지고, 오래된 문장이 새 결정과 섞입니다. CLAUDE.md에는 규칙 열 줄 안팎만 두고 `@docs/CORE.md`, `@docs/PRODUCT_INVARIANTS.md`처럼 정본 파일을 불러오게 하세요. 규칙 첫 줄은 이미 쓰신 문장이면 충분합니다. **새 기능·새 table·새 ontology·새 ADR을 먼저 만들지 않는다. 먼저 대조한다.**\n\n### 2. 한 세션에는 한 가지 일만\n긴 세션일수록 Claude가 앞선 맥락과 지금의 우선순위를 섞습니다. 18일에 이 위험을 직접 짚으셨죠. 일 하나가 끝나면 `/clear`로 비우고, 다음 일은 새로 시작합니다. 이어서 해야 한다면 `/compact`에 무엇을 남길지 적어서 넘기면 됩니다. 예: `/compact 결정된 것과 남은 TODO만`.\n\n### 3. 구현 전에는 plan mode\nShift+Tab을 두 번 누르면 plan mode로 들어갑니다. Claude가 파일을 고치기 전에 무엇을 어디서 바꿀지 먼저 보여줍니다. Founder Direction을 전달하는 7번의 과정과 궁합이 좋습니다. 계획을 읽고 '이건 새 table이네, 기존 테이블로 가능한지 다시'라고 한 번 되돌리는 것만으로 과잉 생성의 대부분이 막힙니다.\n\n### 4. 감사(audit)는 서브에이전트에게\nrepo의 migration 파일 수와 live DB의 `schema_migrations` 기록 수가 맞지 않는다는 점을 A0 점검에서 확인하셨습니다. 이런 전수 대조는 메인 대화에서 하지 말고 서브에이전트에게 맡기세요. 메인 컨텍스트는 깨끗하게 남고, 결과는 표 한 장으로 돌아옵니다. **수정하지 말고 보고만 하라**고 못 박는 것이 핵심입니다.\n\n### 5. 반복되는 전달은 skill로\nFounder Direction을 받아 대조하고 보고하는 절차는 앞으로도 계속 반복됩니다. `.claude/skills/founder-direction/SKILL.md`로 만들어 두면 `/founder-direction` 한 번으로 같은 절차가 매번 같은 품질로 돕니다. Integrity Check(실제 있었나, 내 말인가, 억지 의미는 없나)도 같은 방식으로 skill이 될 수 있습니다.\n\n### 6. 사람 없이 돌아가는 일은 `claude -p`로\n지금 이 아침 창이 바로 그 예입니다. 헤드리스 모드인 `claude -p`는 스크립트 안에서 Claude를 한 번 호출하고 결과만 받아옵니다. Creator OS의 TRANSCRIBE 다음 단계인 Moment 태깅이나 주간 Insight 지표 요약을 이 방식으로 시작하면, 앱을 새로 만들지 않고도 Agent를 가질 수 있습니다.", "actions": ["CLAUDE.md를 규칙 10줄 안팎 + @정본 파일 링크로 정리", "migration 대조를 서브에이전트에게 '보고만' 시키기", "/founder-direction skill 초안 만들기"]}, {"id": "rhythm", "kicker": "오늘의 리듬", "title": "1인 창업자의 에너지는 일정표의 첫 줄에 둔다", "evidence": "Creator OS 90일 리뷰 질문: '김범이 콘텐츠 때문에 소진되는 것이 아니라 더 온순간을 살게 되는가?' · 콘텐츠 질문: '쉬러 왔는데 왜 계속 뭔가 해야 할까?'", "body_md": "온순간은 1인 창업자가 만드는 제품입니다. 그러니 가장 먼저 지켜야 할 자원은 코드도 자금도 아니고 범님의 에너지입니다. Creator OS 브리프의 90일 리뷰 질문 가운데 하나가 정확히 이것이었습니다. **김범이 콘텐츠 때문에 소진되는 것이 아니라 더 온순간을 살게 되는가?** 이 질문은 콘텐츠만이 아니라 빌드와 모두의창업 전체에 그대로 적용됩니다.\n\n### 아침은 깊은 일, 저녁은 사람\n오늘 일정표는 단순한 원칙 하나로 짰습니다. 머리가 가장 맑은 오전 90분은 되돌리기 어려운 판단에 씁니다. 지금은 Insight 정의가 그 일입니다. Claude Code 작업은 그다음입니다. 대화가 길어질수록 시간이 빨리 사라지는 일이라 오전 뒤편에 60분 상자를 씌워 두었습니다. 저녁은 가족의 시간이고, 촬영은 그 시간을 살고 난 뒤의 부산물입니다.\n\n오른쪽 '어느 시간에 일하나요' 막대를 한번 보세요. 밤 11시 이후나 새벽 5시 이전 막대가 길다면, 그건 의지의 문제가 아니라 구조의 문제일 가능성이 큽니다. 밤에 새 세션을 열면 끝이 없습니다. **22시 이후 새 Claude 세션은 열지 않는다**는 규칙 하나만으로도 다음 날 아침 90분이 달라질 수 있습니다.\n\n### 쉼도 일정의 정식 블록입니다\n범님은 '쉬러 왔는데 왜 계속 뭔가 해야 할까', '왜 가족 여행에서 자꾸 일정에 집착할까'를 콘텐츠 질문으로 적어 두셨습니다. 이 질문을 오늘 점심에 작게 살아 보면 어떨까요. 쉬다가 뭔가 해야 할 것 같은 느낌이 올라오면 그 순간을 막지 말고 조각으로 한 줄만 남기는 겁니다. 그게 [나는 왜 또 이럴까?] 시리즈의 Evidence가 됩니다. 쉼을 없애지 않고도 쉼이 콘텐츠가 되는 방식입니다.\n\n### 한 주의 리듬 제안\nCreator OS의 Week A/B 발행 리듬과 모두의창업 게이트를 한 주에 겹쳐 보면 이렇게 됩니다.\n- **월·화·수:** 빌드. 1R 코호트 준비와 Claude Code 작업은 하루 하나의 PR만.\n- **목:** 콘텐츠. selects와 rough cut. 촬영은 따로 잡지 않고 삶에서 옵니다.\n- **금:** 기관과 사람. 연락, 미팅, 멘토링 결정 메모.\n- **토:** 가족과 Field. 국내 하루여행이나 동네 산책.\n- **일:** 예배와 쉼. 밤에 한 주의 Return 10분.\n\n이 리듬은 정답이 아니라 첫 가설입니다. 2주 동안 살아 보고, 맞지 않는 요일은 범님의 말로 고치시면 됩니다. 온순간이 유저에게 약속하는 것처럼, 계획도 판정받는 대상이 아니라 살아 보고 다시 배우는 대상입니다.", "actions": ["22시 이후 새 Claude 세션 열지 않기", "점심 쉼에서 올라온 '해야 할 것 같은 느낌'을 조각 한 줄로", "이번 주 요일 리듬을 2주 동안 가설로 살아 보기"]}], "claude_code": [{"title": "Founder Direction을 /founder-direction 한 번으로", "why": "18일처럼 긴 방향 정리를 전달할 때마다 '대조 먼저, 새 table 금지'를 매번 다시 설명하고 계십니다.", "how": "반복되는 절차는 skill로 만들어 두세요. 붙여넣은 Direction을 구현 지시가 아니라 대조 대상으로 다루고, 결과를 늘 같은 표로 보고하게 됩니다.", "prompt": "이 repo에 .claude/skills/founder-direction/SKILL.md 를 만들어줘.\n역할: 내가 붙여넣는 Founder Direction을 구현 지시로 받지 말고,\nCORE.md · PRODUCT INVARIANTS · Experience Contract · ADR · 실제 코드 · DB와 대조해서\n① 이미 있는 것 ② 충돌하는 것 ③ 정말 새로 필요한 최소 변경 1개\n를 표로 보고하는 절차.\n규칙: 새 table · 새 ontology · 새 ADR을 먼저 만들지 않는다. 코드는 수정하지 않는다."}, {"title": "migration 불일치는 서브에이전트에게 보고만", "why": "A0 점검에서 repo의 migration 파일 수와 live DB 기록이 다르다는 것을 발견하셨습니다. 전수 대조를 메인 대화에서 하면 맥락이 금방 무거워집니다.", "how": "Explore 서브에이전트에게 읽기 전용 감사를 맡기면, 메인 세션은 깨끗하게 남고 결과만 표로 돌아옵니다.", "prompt": "Explore 서브에이전트로 supabase/migrations 폴더의 파일 목록과\nlive DB의 supabase_migrations.schema_migrations 기록을 비교해줘.\n① repo에만 있는 migration ② DB에만 있는 기록 ③ 순서·이름 불일치\n를 표로 보고하고, 아무것도 수정하거나 적용하지 마."}, {"title": "구현 전엔 plan mode, 한 세션엔 한 PR", "why": "Direction이 클수록 Claude가 새 구조를 과하게 만들 위험이 크다고 직접 짚으셨습니다.", "how": "Shift+Tab 두 번으로 plan mode에 들어가 변경 파일과 migration 여부부터 확인합니다. 끝나면 /clear로 비우고 다음 일을 시작합니다.", "prompt": "plan mode로 시작해줘.\n3줄 카드(현재·바람·선택) 저장 흐름에서 '유저가 AI 초안을 자기 말로 고쳤는지'를\n기존 테이블 안에서 계산할 수 있는 방법을 찾아줘. 새 테이블은 금지.\n변경할 파일 목록과 migration 필요 여부만 먼저 보여줘."}, {"title": "Insight 20%를 매주 claude -p로 세기", "why": "1R의 성패가 자기 언어 Insight 비율에 달려 있는데, 지금은 이 숫자를 매번 손으로 확인해야 합니다.", "how": "지표 SQL과 요약을 스크립트로 만들고 헤드리스 호출(claude -p)로 매주 한 줄 보고를 받으세요. 이 아침 창과 같은 방식입니다.", "prompt": "scripts/weekly_insight.sql 과 scripts/weekly_insight.sh 를 만들어줘.\nSQL: 지난 7일 동안 ① 3줄 카드 완료 수 ② AI 초안과 다른 '한 문장'을 쓴 비율\n③ 선택 이후 Return이 기록된 비율.\nsh: SQL 결과를 claude -p 에 넘겨 '1R 목표 20% 대비 이번 주 한 줄 요약'을 출력."}], "watchouts": ["좋은 생각이 떠오르면 곧바로 긴 문서로 넓히고 싶어지는 순간. 오늘은 한 문장으로 적고 거기서 멈춰 봅니다.", "Claude와의 대화가 길어지다 밤이 깊어지는 흐름. 22시 이후엔 새 세션을 열지 않습니다.", "카메라가 경험을 앞지르는 순간. 켜기 전에 한 호흡, 먼저 삽니다."], "evening": ["오늘 가장 기억나는 장면은?", "60초 듣기는 실제로 어땠나요? 했든 못 했든 있는 그대로.", "내일 한 번 살아볼 작은 것 하나는?"], "memory_update": [], "meta": {"source": "manual", "generated_at": "2026-09-23T07:40", "chapter_chars": 7039}, "date": "2026-09-23", "weekday": "수", "name": "범", "stats": {"messages_recent": 3, "sessions_recent": 1, "sessions_period": 1, "active_days_period": 1, "daily": [{"date": "2026-09-10", "count": 0}, {"date": "2026-09-11", "count": 0}, {"date": "2026-09-12", "count": 0}, {"date": "2026-09-13", "count": 0}, {"date": "2026-09-14", "count": 0}, {"date": "2026-09-15", "count": 0}, {"date": "2026-09-16", "count": 0}, {"date": "2026-09-17", "count": 0}, {"date": "2026-09-18", "count": 0}, {"date": "2026-09-19", "count": 0}, {"date": "2026-09-20", "count": 0}, {"date": "2026-09-21", "count": 0}, {"date": "2026-09-22", "count": 0}, {"date": "2026-09-23", "count": 3}], "hours": [0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "top_projects": [["2-", 3]], "top_tools": [["Bash", 25], ["Write", 4], ["Artifact", 2], ["Read", 2], ["SendUserFile", 2], ["ToolSearch", 2], ["Skill", 1], ["mcp__Claude_Code_Remote__read_documentation", 1]], "messages_claude_ai": 0}, "milestones": [{"title": "13주 클로즈드 베타 (40테이블·7,194건)", "date": "2026-08-31", "status": "done", "track": "build", "dday": -23}, {"title": "모두의창업 v2 최종본 제출", "date": null, "status": "done", "track": "build"}, {"title": "변리사 상담 · IP Map (유튜브 공개 전)", "date": null, "status": "now", "track": "build"}, {"title": "Creator OS Phase 0 — 정본 세팅 1주", "date": null, "status": "now", "track": "content"}, {"title": "1R 50명 코호트 시작 (Insight 20% 검증)", "date": null, "status": "next", "track": "build"}, {"title": "Creator OS Phase 1 — 비공개 4편", "date": null, "status": "next", "track": "content"}, {"title": "법인 설립 · IP 이전/라이선스", "date": null, "status": "next", "track": "build"}, {"title": "기관 유료 파일럿 1건 (30명+)", "date": null, "status": "next", "track": "build"}, {"title": "공개 Pilot 8주 (Long 8 + Shorts 12~16)", "date": null, "status": "next", "track": "content"}]};
+const BRIEF = {"greeting": "범님, 좋은 아침입니다. 지난 18일 하루를 꼬박 들여 온순간의 North Star를 다시 세우셨고, 그 끝에 스스로 이렇게 정리하셨죠. '대화를 통째로 넣고 구현하라고 하지 않는다.' 오늘은 그 문장이 제품이 아니라 범님의 하루에 먼저 적용되는 날이면 좋겠습니다.", "one_line": "장면이 먼저, 의미는 나중.", "return_question": "18일에 세운 North Star 문장들 가운데, 이번 주에 실제로 한 번이라도 살아본 문장이 있었나요? 떠오르지 않는다면 그것도 있는 그대로의 Evidence입니다.", "three_lines": {"reality": "철학·설계·신청서는 충분히 깊어졌다. 지금 부족한 것은 더 많은 문장이 아니라, 실제로 살아낸 장면이다.", "wish": "상대를 고치기 전에 제대로 만나는 나 — 아들 앞에서도, 아내 앞에서도, 1R의 50명 앞에서도.", "choice": "오늘 누군가 말을 시작하면, 첫 60초는 답하지 않고 듣는다."}, "day_plan": [{"time": "06:00", "end": "07:00", "title": "기도 · 아침 · 스트레칭", "tag": "life", "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."}, {"time": "07:00", "end": "09:00", "title": "자전거 · 러닝 + 말씀", "tag": "life", "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."}, {"time": "09:00", "end": "13:00", "title": "Activity — 안 가본 곳, 안 해본 것", "tag": "content", "detail": "북한산둘레길 한 구간 — 걷다가 만난 한 사람에게 '왜 걷는지' 묻기"}, {"time": "13:00", "end": "14:00", "title": "점심과 쉼", "tag": "rest", "detail": "쉬다가 '뭔가 해야 할 것 같은 느낌'이 올라오면 한 줄만 적기"}, {"time": "14:00", "end": "18:00", "title": "온순간 빌드 (오늘만)", "tag": "build", "detail": "오늘만 한 블록 바꿈: 'Insight'를 무엇으로 셀지 1페이지 (1R 게이트가 가장 급해서)"}, {"time": "18:00", "end": "19:00", "title": "저녁", "tag": "rest", "detail": "가족과 식탁. 조언 대신 질문 하나."}, {"time": "19:00", "end": "20:00", "title": "글쓰기", "tag": "content", "detail": "오전에 만난 사람의 한마디를 한 문단으로"}, {"time": "20:00", "end": "21:00", "title": "운동", "tag": "life", "detail": "짐 · 러닝 · 수영 중 하나."}, {"time": "21:00", "end": "22:00", "title": "온순간 블로그", "tag": "content", "detail": "오늘의 3줄과 Return을 블로그 한 편으로."}, {"time": "22:00", "end": "22:15", "title": "밤 3분 Return, 그리고 Dream", "tag": "life", "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."}], "build_focus": {"gate": "1단계 · 1R 50명 코호트 (자기 언어 Insight 20%)", "today_task": "'자기 언어 Insight'를 무엇으로 셀지 정의한 1페이지 — 실제 베타 카드로 포함/제외 예시 각 3개", "metric": "베타 카드 20장을 이 정의로 직접 분류했고, 애매한 카드가 몇 장인지 숫자로 적었다"}, "content_mission": {"question": "나는 오늘 누구의 말을 끝까지 들었나?", "shots": [{"key": "WHERE", "hint": "아침 걷는 길의 첫 장면. 20mm로 공간 전체를."}, {"key": "MOVE", "hint": "걷는 발, 계단, 차창. 5초면 충분합니다."}, {"key": "DETAIL", "hint": "식탁 위의 손, 컵, 노트에 적은 3줄. 60mm로 가까이."}, {"key": "HUMAN", "hint": "말하는 사람의 손과 뒷모습. 얼굴 대신 몸짓. 동의가 먼저입니다."}, {"key": "EVIDENCE", "hint": "60초 듣기를 해 본 뒤의 장면. 못 했다면 그 순간을 솔직하게 말한 음성 한 줄."}], "voice_memo": ["방금 무슨 일이 있었나?", "예상과 무엇이 달랐나?", "내게 뭐가 걸렸나?"], "episode_seed": "[오늘 한번 살아봤습니다] 말을 끊지 않고 60초 듣기 → D+7에 [그 뒤 어떻게 됐을까?]로 돌아오기. 비공개 Phase 1의 첫 편 후보."}, "chapters": [{"id": "life", "kicker": "온순간을 산다", "title": "창업자가 자기 제품의 첫 유저가 되는 하루", "evidence": "9/18 Founder Direction: 'Founder는 온순간의 첫 번째 Storydoer다' · 베타 13주: 자기 언어 Insight 도달 14명 중 1명(7%)", "body_md": "18일의 Founder Direction에서 가장 무거운 문장은 아마 이것이었습니다. **Founder는 온순간의 첫 번째 Storydoer다.** 그리고 13주 베타가 돌려준 가장 정직한 숫자는 이것이었고요. 자기 언어의 Insight에 닿은 사람은 14명 중 1명, 7%였습니다. 원인은 이미 정리하셨습니다. 긴 AI 해석이 '내 말'과 다음 선택으로 이어지지 않았다는 것.\n\n오늘은 이 두 문장을 나란히 놓아 보시면 좋겠습니다. 판정하려는 게 아니라 비춰 보려는 겁니다. 범님은 생각이 깊고 빠른 분입니다. 한 장면에서 삶의 원리를 곧바로 길어 올리고, 그것을 몇 시간이고 문서로 넓혀 갈 수 있습니다. 그 힘이 온순간을 여기까지 데려왔습니다. 다만 Creator OS 브리프에서 범님 스스로 적어 두셨듯, **의미를 너무 빨리 발견하는 것은 장점이면서 위험입니다.** 긴 해석이 유저의 '내 말'을 가리듯, 범님의 긴 해석도 범님 자신의 '오늘 한 번'을 가릴 수 있습니다.\n\n### 가능성 두 가지 (가설입니다)\n- 하나. 온순간이 유저에게 주려는 것, 곧 짧은 조각과 한 문장과 작은 선택을 범님이 먼저 매일 쓰지 않으면, 제품의 병목과 창업자의 병목이 같은 모양으로 남을 수 있습니다.\n- 둘. 반대로 범님이 오늘 한 번 짧게 살아 보면, 그 체감이 1R 넛지 설계의 가장 정확한 데이터가 될 수 있습니다. 어떤 질문에서 손이 멈췄는지, 어떤 문장이 내 말처럼 느껴졌는지.\n\n어느 쪽이 맞는지는 범님이 정합니다. 오늘 제안은 하나뿐입니다. 온순간의 Daily UX를 그대로 범님의 하루에 적용해 보는 것입니다. **[조각] 지금 남기고 싶은 것은? → [한 문장] 이 순간에서 놓치고 싶지 않은 것은?** 여기서 끝나도 정상입니다. 필요할 때만 [오늘 한 번], 실제로 했을 때만 [살아보니].\n\n### 오늘의 관계 장면\n범님이 적어 둔 Journey가 있습니다. '사람을 고치기 전에 제대로 만나는 삶.' 그 아래 네 개의 thread가 있었죠. 말을 끝까지 기다리는 아빠, 갈등 중에도 같은 편에 남는 남편, 재촉하지 않고 듣는 아들, 답하기 전에 상대가 본 문제를 먼저 묻는 동료. 오늘은 이 가운데 하나만 고르면 됩니다. 저라면 오늘 가장 먼저 말을 걸어올 사람을 고르겠습니다. Right Moment는 계획보다 그 사람이 입을 여는 순간에 더 가깝기 때문입니다.\n\n> 오늘 누군가 말을 시작하면, 첫 60초는 답하지 않고 듣는다.\n\n못 해도 괜찮습니다. 온순간에서 실패는 판정이 아니라 다음 Evidence입니다. 밤에 '몇 초쯤에서 입을 열었는지'만 적어 두면, 그게 내일 아침의 A가 됩니다.", "actions": ["3줄 카드의 '선택'을 범님의 말로 고쳐 쓰기", "오늘 한 사람 앞에서 첫 60초 듣기 (몇 초에서 입을 열었는지만 기억)", "[조각] 한 줄 + [한 문장] 한 줄로 오늘을 남기기 — 더 쓰고 싶어도 거기서 멈추기"]}, {"id": "build", "kicker": "비즈니스 빌드업", "title": "지금 통과할 게이트는 하나: 1R 50명과 Insight 20%", "evidence": "모두의창업 v2: '일정표를 통과 기준이 있는 게이트로 바꿨습니다' · 멘토링 요청 ①: '공개·실증이 신규성에 영향을 줄 수 있으므로'", "body_md": "모두의창업 v2에서 가장 잘 하신 일은 일정표를 **통과 기준이 있는 게이트**로 바꾼 것입니다. 게이트 방식의 장점은 오늘 해야 할 일이 저절로 좁혀진다는 데 있습니다. 지금 게이트는 하나, 1R 50명 코호트에서 자기 언어 Insight 20%를 검증하는 것입니다. 기관 파일럿, 선물 경제, 소셜벤처 판별은 모두 이 게이트 뒤에 있습니다.\n\n### 1. 'Insight'를 먼저 셀 수 있게 만드세요\n20%라는 목표보다 앞서야 할 것은 무엇을 1로 셀지입니다. 베타의 7%가 어떤 정의로 나온 숫자인지, 1R에서도 같은 정의를 쓸지부터 적어 두시길 권합니다. 예를 들면 이렇습니다.\n- **포함:** 유저가 AI 비춤을 받은 뒤, AI 문장을 복사하지 않고 자기 단어로 쓴 '한 문장'이 있고, 그것이 이전 기록과 다른 관점을 담고 있다.\n- **제외:** AI 문장을 그대로 수락한 경우, 감정 표현만 있고 관점 변화가 없는 경우.\n- **애매:** 따로 표시하고 숫자로 셉니다. 애매한 비율이 높다면 정의보다 UX가 문제일 수 있습니다.\n\n베타 카드 20장을 이 기준으로 직접 분류해 보세요. 한 시간이면 됩니다. 분류가 흔들리는 지점이 곧 1R 넛지를 고칠 지점입니다. 이미 40개 테이블과 7,194건이 있으니 **새 테이블을 만들지 말고**, 원문과 AI 초안과 최종 문장의 차이를 기존 데이터에서 계산할 수 있는지부터 확인하시면 됩니다.\n\n### 2. 공개하기 전에 변리사를 먼저 만나세요\n오늘 가장 놓치기 쉬운 연결고리가 여기 있습니다. v2의 멘토링 요청 1번에 이미 적어 두셨습니다. **공개와 실증이 신규성에 영향을 줄 수 있다.** 그런데 Creator OS Phase 2는 공개 Pilot이고, 3줄 카드는 콘텐츠로도 그대로 읽힙니다. 유튜브에 A-B-Bridge 구조, Lived Evidence 기반 넛지, Storydoing→Return→Gift 흐름이 화면으로 나가는 순간이 곧 공개 시점일 수 있습니다. 그래서 순서는 이렇게 권합니다. **Phase 1 비공개 4편 → 변리사 상담과 IP Map → Phase 2 공개.** 비공개 4편을 먼저 만들자는 브리프의 설계가 IP 관점에서도 정확히 맞는 셈입니다.\n\n### 3. 기관 3곳에는 '담당자의 다음 행동' 하나씩\n후보 기관마다 한 줄씩만 적어 보세요. 그 기관 담당자가 다음 달에 해야 하는 보고는 무엇인가. 온순간의 기관 리포트가 그 보고의 한 페이지를 대신할 수 있다면, 그게 제안서의 첫 장입니다. 23년간 전략 파트너사를 설계해 오신 범님에게는 익숙한 일입니다. 매장 대신 기관, POS 대신 동의 범위의 집계 리포트로 바뀌었을 뿐입니다.\n\n### 4. 멘토 시간은 결정 직전에만\nv2에 쓰신 대로 멘토님의 시간은 결정 직전에만 요청하시면 됩니다. 그러려면 결정 메모 양식 하나가 필요합니다. **결정할 것 / 선택지 2~3개 / 근거 / 되돌리기 어려운 정도 / 마감일.** 첫 메모의 주제는 '공개 전 출원 범위'가 좋겠습니다.", "actions": ["Insight 정의 1페이지 작성 후 베타 카드 20장 직접 분류", "변리사에게 물을 '공개 전 출원 범위' 질문 5개 정리", "후보 기관 3곳의 '담당자 다음 행동' 한 줄씩, 1곳에 연락"]}, {"id": "content", "kicker": "콘텐츠 실행", "title": "매일 찍지 않는다, 오늘 한 장면만 목격한다", "evidence": "Creator OS 브리프: 'Phase 0 — 1주 정본 세팅', '매일 콘텐츠를 만들지 않는다. 매일 온순간을 살고 증거만 남긴다.'", "body_md": "Creator OS 브리프의 첫 문장으로 돌아가 봅니다. **나는 유튜브를 하기 위해 온순간을 사는 것이 아니다.** 이번 주에 할 일은 촬영이 아니라 Phase 0, 정본을 세팅하는 1주입니다. 영상을 한 편도 만들지 않아도 되는 주간이라는 뜻이기도 합니다.\n\n### Phase 0에 필요한 최소한\n- **촬영 헌법 한 장:** Experience First · No Re-enactment · No Manufactured Wisdom · No Forced Choice · Return Honestly. 거기에 '보여주지 않은 것은 해석하지 않는다'를 더하면 됩니다.\n- **5-shot 카드:** WHERE · MOVE · DETAIL · HUMAN · EVIDENCE. Pocket 4P 케이스에 붙여 둘 크기면 충분합니다.\n- **파일 규칙:** `20260923_장소_사람또는질문_shot번호`. 폴더는 `raw / voice / selects / episodes` 네 개로 시작합니다. 메타데이터는 나중에 AI가 채웁니다.\n- **동의 기준:** 가족도 동의 대상입니다. 아내와 아들에게 \"당신 얼굴은 찍지 않는다, 목소리는 물어보고 쓴다\"를 먼저 말해 두세요.\n\nAgent 10개는 지금 만들지 않습니다. 브리프에 쓰신 대로 **커스텀 개발은 반복 검증된 병목에만** 합니다. Phase 1에서 실제로 막히는 곳은 아마 둘일 겁니다. 음성을 텍스트로 옮기는 일, 그리고 몇 시간짜리 footage에서 장면을 찾는 일. 둘 다 기존 도구와 Claude Code 헤드리스 호출로 충분히 시작할 수 있습니다.\n\n### 오늘의 선택이 곧 첫 편이 될 수 있습니다\n오늘의 선택인 '첫 60초는 답하지 않고 듣기'는 그대로 **[오늘 한번 살아봤습니다]** 시리즈의 첫 편 씨앗입니다. 콘텐츠를 기획하지 않았는데 삶에서 콘텐츠가 생기는 구조, 브리프가 말한 Life → Story → Storydoing → Life가 바로 이것입니다. 오늘 해야 할 촬영은 딱 하나입니다. 듣기를 해 본 뒤, 또는 못 했던 순간 뒤에 10~30분을 기다렸다가 60초짜리 Voice Memo를 남기는 것.\n\n> 방금 무슨 일이 있었나? 예상과 무엇이 달랐나? 내게 뭐가 걸렸나?\n\n그 음성이 편집 때 가장 좋은 내레이션 원재료가 됩니다. 그리고 D+7에 다시 묻습니다. 정말 했는가? 7일 중 2일이었다면 제목은 이미 나와 있습니다. '7일 중 2일밖에 못 했습니다.' 시청자가 돌아오는 이유는 성공이 아니라 정직한 Return입니다.\n\n### 콘텐츠와 비즈니스가 만나는 곳\n3줄 카드는 유저에게는 자기코칭의 근거이고, 밖에서는 콘텐츠이고, 기관에는 변화의 근거입니다. 범님이 직접 만든 3줄 카드와 그 뒤의 Return이 쌓이면, 그 자체로 기관 제안서에 넣을 수 있는 1인칭 사례가 됩니다. 단, 공개는 IP 확인 뒤에 합니다.", "actions": ["촬영 헌법 + 5-shot + 파일 규칙을 A4 한 장으로", "아내·아들에게 촬영 원칙(얼굴 X, 목소리는 동의 후) 먼저 말하기", "60초 듣기 뒤 10~30분 기다렸다가 Voice Memo 1개"]}, {"id": "claude", "kicker": "Claude Code 마스터리", "title": "Claude Code를 '깊은 대화 상대'에서 '운영체제'로", "evidence": "9/18 정리: '대화를 통째로 넣고 구현해라고 하지 않는다 … 7번의 전달' · A0 점검: repo migration 파일 수와 live schema_migrations 기록 불일치", "body_md": "범님은 Claude Code를 대화 상대로 아주 깊이 쓰고 계십니다. 18일 하루의 정리만 해도 20만 자가 넘는 문서가 되었으니까요. 이제 필요한 전환은 Claude Code를 **깊은 대화 상대에서 반복 가능한 운영체제로** 바꾸는 일입니다. 범님이 이미 적어 두신 원칙, 즉 작게 나누기, 실제 데이터 먼저 검수하기, 기존 MVP 깨지 않기, 하나의 source of truth를 도구 쪽에서 강제하는 방법이 있습니다.\n\n### 1. CLAUDE.md는 짧게, 정본은 링크로\nCLAUDE.md에 철학을 다 넣으면 매 세션이 무거워지고, 오래된 문장이 새 결정과 섞입니다. CLAUDE.md에는 규칙 열 줄 안팎만 두고 `@docs/CORE.md`, `@docs/PRODUCT_INVARIANTS.md`처럼 정본 파일을 불러오게 하세요. 규칙 첫 줄은 이미 쓰신 문장이면 충분합니다. **새 기능·새 table·새 ontology·새 ADR을 먼저 만들지 않는다. 먼저 대조한다.**\n\n### 2. 한 세션에는 한 가지 일만\n긴 세션일수록 Claude가 앞선 맥락과 지금의 우선순위를 섞습니다. 18일에 이 위험을 직접 짚으셨죠. 일 하나가 끝나면 `/clear`로 비우고, 다음 일은 새로 시작합니다. 이어서 해야 한다면 `/compact`에 무엇을 남길지 적어서 넘기면 됩니다. 예: `/compact 결정된 것과 남은 TODO만`.\n\n### 3. 구현 전에는 plan mode\nShift+Tab을 두 번 누르면 plan mode로 들어갑니다. Claude가 파일을 고치기 전에 무엇을 어디서 바꿀지 먼저 보여줍니다. Founder Direction을 전달하는 7번의 과정과 궁합이 좋습니다. 계획을 읽고 '이건 새 table이네, 기존 테이블로 가능한지 다시'라고 한 번 되돌리는 것만으로 과잉 생성의 대부분이 막힙니다.\n\n### 4. 감사(audit)는 서브에이전트에게\nrepo의 migration 파일 수와 live DB의 `schema_migrations` 기록 수가 맞지 않는다는 점을 A0 점검에서 확인하셨습니다. 이런 전수 대조는 메인 대화에서 하지 말고 서브에이전트에게 맡기세요. 메인 컨텍스트는 깨끗하게 남고, 결과는 표 한 장으로 돌아옵니다. **수정하지 말고 보고만 하라**고 못 박는 것이 핵심입니다.\n\n### 5. 반복되는 전달은 skill로\nFounder Direction을 받아 대조하고 보고하는 절차는 앞으로도 계속 반복됩니다. `.claude/skills/founder-direction/SKILL.md`로 만들어 두면 `/founder-direction` 한 번으로 같은 절차가 매번 같은 품질로 돕니다. Integrity Check(실제 있었나, 내 말인가, 억지 의미는 없나)도 같은 방식으로 skill이 될 수 있습니다.\n\n### 6. 사람 없이 돌아가는 일은 `claude -p`로\n지금 이 아침 창이 바로 그 예입니다. 헤드리스 모드인 `claude -p`는 스크립트 안에서 Claude를 한 번 호출하고 결과만 받아옵니다. Creator OS의 TRANSCRIBE 다음 단계인 Moment 태깅이나 주간 Insight 지표 요약을 이 방식으로 시작하면, 앱을 새로 만들지 않고도 Agent를 가질 수 있습니다.", "actions": ["CLAUDE.md를 규칙 10줄 안팎 + @정본 파일 링크로 정리", "migration 대조를 서브에이전트에게 '보고만' 시키기", "/founder-direction skill 초안 만들기"]}, {"id": "rhythm", "kicker": "오늘의 리듬", "title": "범님이 설계한 리듬 위에 하루를 얹는다", "evidence": "2nd Life 엑셀 · Bucket lists 시트의 요일별 일과 · 90일 미션 0번 '건강 완전 회복' · '설렘의 여정' 제작 원칙", "body_md": "범님은 이미 스스로 이상적인 한 주를 설계해 두셨습니다. 2nd Life 엑셀의 Bucket lists 시트에 있는 그 표입니다. **06시 기도와 스트레칭, 07시 자전거와 러닝 그리고 말씀, 19시 글쓰기, 20시 운동, 21시 온순간 블로그, 22시 Dream.** 요일마다 색도 다릅니다. 월·화는 콘텐츠와 온순간, 수·목은 안 가본 곳과 안 해본 것, 금요일은 AI 빌드업, 토요일은 하루 여행, 주일은 예배와 섬김.\n\n그래서 이 창의 '오늘의 흐름'은 새 일정을 만들지 않고, 범님이 설계한 그 리듬을 그대로 가져옵니다. 조언은 그 위에 오늘 무엇을 할지만 얹습니다. 계획을 새로 세우는 데 쓰는 에너지를 아끼고, 이미 정한 리듬을 살아보는 데 쓰기 위해서입니다.\n\n### 리듬을 지키는 가장 작은 규칙\n- **아침 두 시간(06~09시)은 몸과 영에 먼저.** 90일 미션의 0번이 '건강 완전 회복'이었습니다. 이 두 시간이 무너지면 나머지 계획도 흔들립니다.\n- **22시 이후에는 새 Claude 세션을 열지 않습니다.** 22시는 Dream의 시간입니다. 밤 늦게 시작한 대화는 끝이 없고, 다음 날 아침 두 시간을 가져갑니다.\n- **쉼은 빈칸이 아니라 정식 블록입니다.** 13시 점심과 18시 저녁은 가족의 시간입니다. 촬영은 그 시간을 살고 난 뒤의 부산물입니다.\n\n### 수·목 Activity가 콘텐츠가 되는 방식\n범님이 수·목을 '안 가본 곳, 안 해본 것'으로 비워 둔 것은 Creator OS 브리프의 공식과 정확히 겹칩니다. **한 여행, 한 사람, 한 질문, 한 선택, 그리고 그 뒤.** 위의 레이더가 이달의 걷기길과 축제를 찾아오는 이유도 여기 있습니다. 목록은 범님이 엑셀에 직접 만든 월별 여행지에서 먼저 고르고, 실제 날짜는 검색으로 확인합니다.\n\n### '설렘의 여정'에서 배운 것\n범님이 적어 두신 리얼리티 제작 원칙이 있습니다. 디렉팅이 아니라 환경을 설계한다. 지시보다 기다린다. 이 원칙은 촬영에만 해당하지 않습니다. 오늘 하루에도 그대로 쓸 수 있습니다. 해야 할 일을 스스로에게 지시하기보다, 그 일이 자연스럽게 일어날 환경을 먼저 만들어 두는 겁니다. 예를 들면 이렇습니다. 전날 밤 자전거 옆에 운동화를 두고, 책상 위에 오늘의 3줄만 펴 둡니다.\n\n이 리듬도 판정받는 대상이 아닙니다. 2주 동안 살아 보고, 맞지 않는 요일이 있으면 config.json의 weekly_rhythm을 범님의 말로 고치시면 됩니다.", "actions": ["22시 이후 새 Claude 세션 열지 않기", "내일 아침 자전거 옆에 운동화 두기 — 지시 대신 환경", "맞지 않는 요일 리듬이 보이면 config.json에서 한 줄 고치기"]}], "claude_code": [{"title": "Founder Direction을 /founder-direction 한 번으로", "why": "18일처럼 긴 방향 정리를 전달할 때마다 '대조 먼저, 새 table 금지'를 매번 다시 설명하고 계십니다.", "how": "반복되는 절차는 skill로 만들어 두세요. 붙여넣은 Direction을 구현 지시가 아니라 대조 대상으로 다루고, 결과를 늘 같은 표로 보고하게 됩니다.", "prompt": "이 repo에 .claude/skills/founder-direction/SKILL.md 를 만들어줘.\n역할: 내가 붙여넣는 Founder Direction을 구현 지시로 받지 말고,\nCORE.md · PRODUCT INVARIANTS · Experience Contract · ADR · 실제 코드 · DB와 대조해서\n① 이미 있는 것 ② 충돌하는 것 ③ 정말 새로 필요한 최소 변경 1개\n를 표로 보고하는 절차.\n규칙: 새 table · 새 ontology · 새 ADR을 먼저 만들지 않는다. 코드는 수정하지 않는다."}, {"title": "migration 불일치는 서브에이전트에게 보고만", "why": "A0 점검에서 repo의 migration 파일 수와 live DB 기록이 다르다는 것을 발견하셨습니다. 전수 대조를 메인 대화에서 하면 맥락이 금방 무거워집니다.", "how": "Explore 서브에이전트에게 읽기 전용 감사를 맡기면, 메인 세션은 깨끗하게 남고 결과만 표로 돌아옵니다.", "prompt": "Explore 서브에이전트로 supabase/migrations 폴더의 파일 목록과\nlive DB의 supabase_migrations.schema_migrations 기록을 비교해줘.\n① repo에만 있는 migration ② DB에만 있는 기록 ③ 순서·이름 불일치\n를 표로 보고하고, 아무것도 수정하거나 적용하지 마."}, {"title": "구현 전엔 plan mode, 한 세션엔 한 PR", "why": "Direction이 클수록 Claude가 새 구조를 과하게 만들 위험이 크다고 직접 짚으셨습니다.", "how": "Shift+Tab 두 번으로 plan mode에 들어가 변경 파일과 migration 여부부터 확인합니다. 끝나면 /clear로 비우고 다음 일을 시작합니다.", "prompt": "plan mode로 시작해줘.\n3줄 카드(현재·바람·선택) 저장 흐름에서 '유저가 AI 초안을 자기 말로 고쳤는지'를\n기존 테이블 안에서 계산할 수 있는 방법을 찾아줘. 새 테이블은 금지.\n변경할 파일 목록과 migration 필요 여부만 먼저 보여줘."}, {"title": "Insight 20%를 매주 claude -p로 세기", "why": "1R의 성패가 자기 언어 Insight 비율에 달려 있는데, 지금은 이 숫자를 매번 손으로 확인해야 합니다.", "how": "지표 SQL과 요약을 스크립트로 만들고 헤드리스 호출(claude -p)로 매주 한 줄 보고를 받으세요. 이 아침 창과 같은 방식입니다.", "prompt": "scripts/weekly_insight.sql 과 scripts/weekly_insight.sh 를 만들어줘.\nSQL: 지난 7일 동안 ① 3줄 카드 완료 수 ② AI 초안과 다른 '한 문장'을 쓴 비율\n③ 선택 이후 Return이 기록된 비율.\nsh: SQL 결과를 claude -p 에 넘겨 '1R 목표 20% 대비 이번 주 한 줄 요약'을 출력."}], "watchouts": ["좋은 생각이 떠오르면 곧바로 긴 문서로 넓히고 싶어지는 순간. 오늘은 한 문장으로 적고 거기서 멈춰 봅니다.", "Claude와의 대화가 길어지다 밤이 깊어지는 흐름. 22시 이후엔 새 세션을 열지 않습니다.", "카메라가 경험을 앞지르는 순간. 켜기 전에 한 호흡, 먼저 삽니다."], "evening": ["오늘 가장 기억나는 장면은?", "60초 듣기는 실제로 어땠나요? 했든 못 했든 있는 그대로.", "내일 한 번 살아볼 작은 것 하나는?"], "memory_update": [], "meta": {"source": "manual", "generated_at": "2026-09-23T08:01", "chapter_chars": 6998}, "top3": [{"tag": "life", "text": "누군가 말을 시작하면 첫 60초는 듣기", "why": "오늘의 선택. 몇 초에서 입을 열었는지만 기억해 두기"}, {"tag": "build", "text": "'Insight'를 무엇으로 셀지 1페이지 정의", "why": "1R 50명 게이트의 첫 단추. 베타 카드 20장으로 직접 분류"}, {"tag": "content", "text": "걸린 장면 하나를 60초 음성으로 남기기", "why": "매일 찍지 않는다. 한 장면만 목격한다"}], "radar": {"grants": [{"title": "2026년 경기 미래콘텐츠 제작지원", "org": "경기도 · 경기콘텐츠진흥원", "deadline": null, "status": "확인 필요", "fit": "AI 기반 콘텐츠·서비스를 만드는 경기도 예비창업자도 신청 가능. 창업·재도전 기업 4천만원", "action": "접수 마감일과 예비창업자 요건을 공고에서 확인", "url": "https://www.gcon.or.kr/gcon/business/gconNotice/view.do?pbancSrnm=11107&menuNo=200061"}, {"title": "K-Startup 진행 중 사업공고", "org": "창업진흥원", "deadline": null, "status": "상시", "fit": "검색 시점에 접수 중인 소셜벤처 공모는 찾지 못함 (제10회 소셜벤처 혁신경연대회는 8/21 마감)", "action": "'예비창업' · '소셜' 필터로 새 공고 확인", "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do"}, {"title": "기업마당 지원사업 검색", "org": "중소벤처기업부", "deadline": null, "status": "상시", "fit": "경기 예비·초기 창업 공고가 모이는 곳", "action": "지역 '경기' + 분야 '창업'으로 검색", "url": "https://www.bizinfo.go.kr"}], "ai_edu": [{"title": "[무료 세미나] 바이브코딩 x AI agent 2일 완성 워크샵", "org": "패스트캠퍼스", "date": "확인 필요", "format": "온라인", "cost": "무료", "fit": "Claude Code로 온순간을 직접 만드는 범님의 방식과 가장 가까운 주제", "url": "https://fastcampus.co.kr/event_online_vibeagent"}, {"title": "지식(GSEEK) 경기도 평생학습", "org": "경기도", "date": "상시", "format": "온라인", "cost": "무료", "fit": "경기도민 무료 AI·디지털 강좌", "url": "https://www.gseek.kr"}, {"title": "K-MOOC 인공지능 강좌", "org": "국가평생교육진흥원", "date": "상시", "format": "온라인", "cost": "무료", "fit": "온순간 강사 준비용으로 AI 개념을 정리하기 좋음", "url": "https://www.kmooc.kr"}], "events": [{"title": "안동국제탈춤페스티벌", "place": "안동 원도심 · 하회마을", "date_start": "2026-09-24", "date_end": "2026-10-04", "fit": "주제 '가면의 기억, 모두의 춤' — 나는 어떤 가면을 쓰고 살아왔나?", "shot": "탈을 쓰기 전과 벗은 뒤의 손", "url": "https://korean.visitkorea.or.kr/kfes/detail/fstvlDetail.do?fstvlCntntsId=644495a7-65e3-42ef-8993-e18e2e71a8bd"}, {"title": "2026 수원화성 미디어아트", "place": "수원 화서문 · 장안문 일원", "date_start": "2026-09-19", "date_end": "2026-10-06", "fit": "집에서 가까운 저녁 산책. 아내와 함께 걷는 Return 장면", "shot": "성곽 위 빛과 두 사람의 뒷모습", "url": "https://www.djournal.co.kr/news/article.html?no=114887"}, {"title": "금산세계인삼축제", "place": "금산세계인삼엑스포광장", "date_start": "2026-10-02", "date_end": "2026-10-11", "fit": "몇 년을 기다려야 캐는 인삼 — 오래 기다린 사람의 이야기", "shot": "인삼을 캐는 손과 흙", "url": "https://korean.visitkorea.or.kr/kfes/detail/fstvlDetail.do?fstvlCntntsId=933425f6-3f59-4de2-9d0d-39cbfb478d8e"}, {"title": "북한산둘레길", "place": "서울 · 경기 북부", "date_start": null, "date_end": null, "fit": "범님의 9~11월 걷기 목록. 수요일 Activity로 한 구간", "shot": "매일 오는 사람의 등산화", "url": "https://search.naver.com/search.naver?query=%EB%B6%81%ED%95%9C%EC%82%B0%EB%91%98%EB%A0%88%EA%B8%B8"}], "meta": {"source": "web", "searched_at": "2026-09-23T07:55", "note": "샘플: Claude가 이 대화에서 직접 검색해 확인한 결과입니다. 마감일을 확인하지 못한 항목은 '확인 필요'로 표시했습니다."}}, "date": "2026-09-23", "weekday": "수", "name": "범", "stats": {"messages_recent": 5, "sessions_recent": 1, "sessions_period": 1, "active_days_period": 1, "daily": [{"date": "2026-09-10", "count": 0}, {"date": "2026-09-11", "count": 0}, {"date": "2026-09-12", "count": 0}, {"date": "2026-09-13", "count": 0}, {"date": "2026-09-14", "count": 0}, {"date": "2026-09-15", "count": 0}, {"date": "2026-09-16", "count": 0}, {"date": "2026-09-17", "count": 0}, {"date": "2026-09-18", "count": 0}, {"date": "2026-09-19", "count": 0}, {"date": "2026-09-20", "count": 0}, {"date": "2026-09-21", "count": 0}, {"date": "2026-09-22", "count": 0}, {"date": "2026-09-23", "count": 5}], "hours": [0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "top_projects": [["2-", 5]], "top_tools": [["Bash", 36], ["Write", 4], ["SendUserFile", 3], ["Artifact", 2], ["Read", 2], ["ToolSearch", 2], ["Skill", 1], ["mcp__Claude_Code_Remote__read_documentation", 1]], "messages_claude_ai": 0}, "milestones": [{"title": "13주 클로즈드 베타 (40테이블·7,194건)", "date": "2026-08-31", "status": "done", "track": "build", "dday": -23}, {"title": "모두의창업 v2 최종본 제출", "date": null, "status": "done", "track": "build"}, {"title": "변리사 상담 · IP Map (유튜브 공개 전)", "date": null, "status": "now", "track": "build"}, {"title": "Creator OS Phase 0 — 정본 세팅 1주", "date": null, "status": "now", "track": "content"}, {"title": "1R 50명 코호트 시작 (Insight 20% 검증)", "date": null, "status": "next", "track": "build"}, {"title": "Creator OS Phase 1 — 비공개 4편", "date": null, "status": "next", "track": "content"}, {"title": "법인 설립 · IP 이전/라이선스", "date": null, "status": "next", "track": "build"}, {"title": "기관 유료 파일럿 1건 (30명+)", "date": null, "status": "next", "track": "build"}, {"title": "공개 Pilot 8주 (Long 8 + Shorts 12~16)", "date": null, "status": "next", "track": "content"}]};
 
 (function () {
   const D = typeof BRIEF === "object" && BRIEF ? BRIEF : {};
@@ -384,23 +318,28 @@ const BRIEF = {"greeting": "범님, 좋은 아침입니다. 지난 18일 하루�
     set(k, v) { try { localStorage.setItem(key(k), JSON.stringify(v)); } catch (e) {} },
   };
   const TAGS = { life: "삶", build: "빌드", content: "콘텐츠", claude: "Claude", rest: "쉼" };
+  const tagOf = (t) => (TAGS[t] ? t : "rest");
   const toMin = (t) => { const m = /^(\d{1,2}):(\d{2})/.exec(t || ""); return m ? +m[1] * 60 + +m[2] : null; };
   const now = new Date();
   const nowMin = now.getHours() * 60 + now.getMinutes();
-  const isToday = D.date === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const isToday = D.date === ymd(now);
+  const base = D.date ? new Date(D.date + "T00:00:00") : now;
+  const daysTo = (s) => { if (!s || !/^\d{4}-\d{2}-\d{2}/.test(s)) return null; return Math.round((new Date(s.slice(0, 10) + "T00:00:00") - base) / 86400000); };
+  const md = (m, d) => { const x = /^\d{4}-(\d{2})-(\d{2})/.exec(d || ""); return x ? `${+x[1]}/${+x[2]}` : ""; };
 
-  // ---------- theme toggle
+  // ---------- theme
   const themeBtn = $("themeBtn");
   const applyTheme = (t) => { if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); themeBtn.textContent = t === "dark" ? "밤 테마" : t === "light" ? "낮 테마" : "시스템 테마"; };
   let theme = null; try { theme = localStorage.getItem("onmoment:theme"); } catch (e) {}
   applyTheme(theme);
   themeBtn.addEventListener("click", () => { theme = theme === null ? "light" : theme === "light" ? "dark" : null; try { theme ? localStorage.setItem("onmoment:theme", theme) : localStorage.removeItem("onmoment:theme"); } catch (e) {} applyTheme(theme); });
 
-  // ---------- status banner: Claude가 쓰는 중이거나 실패했을 때
+  // ---------- banner (Claude가 쓰는 중 / 실패)
   (function banner() {
     const el = $("banner"), meta = D.meta || {};
     const started = meta.generated_at ? new Date(meta.generated_at) : now;
-    const limit = (meta.timeout || 360) + 120;
+    const limit = (meta.timeout || 480) + 120;
     if (meta.pending) {
       const tick = () => {
         const sec = Math.max(0, Math.round((Date.now() - started.getTime()) / 1000));
@@ -410,7 +349,7 @@ const BRIEF = {"greeting": "범님, 좋은 아침입니다. 지난 18일 하루�
           return false;
         }
         el.dataset.kind = "pending";
-        el.innerHTML = `<span><i class="pulse" aria-hidden="true"></i><b>Claude가 범님의 최근 대화를 읽고 오늘의 조언을 쓰는 중입니다</b> · <span class="num">${Math.floor(sec / 60)}분 ${sec % 60}초</span></span><small>보통 1~3분 · 먼저 내장 조언을 보여드립니다 · 완성되면 자동으로 바뀝니다</small>`;
+        el.innerHTML = `<span><i class="pulse" aria-hidden="true"></i><b>Claude가 범님의 대화를 읽고, 오늘의 기회를 검색하는 중입니다</b> · <span class="num">${Math.floor(sec / 60)}분 ${sec % 60}초</span></span><small>보통 2~5분 · 완성되면 자동으로 바뀝니다</small>`;
         return true;
       };
       el.hidden = false;
@@ -419,222 +358,183 @@ const BRIEF = {"greeting": "범님, 좋은 아침입니다. 지난 18일 하루�
         setTimeout(() => { if (el.dataset.kind === "pending" && window.scrollY < 200) location.reload(); }, 15000);
       }
     } else if (meta.note) {
-      el.hidden = false;
-      el.dataset.kind = "error";
+      el.hidden = false; el.dataset.kind = "error";
       el.innerHTML = `<span><b>오늘은 내장 조언입니다.</b> Claude 연결이 되지 않았어요.</span><small>${esc(meta.note)}</small>`;
     }
   })();
 
-  // ---------- sky
-  const h = isToday ? now.getHours() : 6;
-  const sky = h < 6 ? ["rgba(70,80,160,.30)", "rgba(150,110,170,.18)"]
-    : h < 9 ? ["rgba(130,140,210,.22)", "rgba(240,160,95,.30)"]
-    : h < 16 ? ["rgba(120,175,220,.22)", "rgba(210,225,215,.18)"]
-    : h < 19 ? ["rgba(235,180,110,.26)", "rgba(220,120,90,.20)"]
-    : ["rgba(60,70,140,.30)", "rgba(120,90,150,.20)"];
+  // ---------- 1. hero
+  const h = isToday ? now.getHours() : 7;
+  const sky = h < 6 ? ["rgba(70,80,160,.30)", "rgba(150,110,170,.18)"] : h < 9 ? ["rgba(130,140,210,.22)", "rgba(240,160,95,.30)"]
+    : h < 16 ? ["rgba(120,175,220,.22)", "rgba(210,225,215,.18)"] : h < 19 ? ["rgba(235,180,110,.26)", "rgba(220,120,90,.20)"] : ["rgba(60,70,140,.30)", "rgba(120,90,150,.20)"];
   $("sky").style.setProperty("--sky", `linear-gradient(180deg, ${sky[0]}, ${sky[1]})`);
-
-  const [y, mo, d] = (D.date || "").split("-");
-  $("date").textContent = D.date ? `${y}. ${+mo}. ${+d} (${D.weekday || ""}) · 온순간 아침 창` : "온순간 아침 창";
-  $("greeting").textContent = D.greeting || "";
+  const [yy, mm, dd] = (D.date || "").split("-");
+  $("date").textContent = D.date ? `${yy}. ${+mm}. ${+dd} (${D.weekday || ""}) · 온순간 아침 창` : "온순간 아침 창";
   $("oneLine").textContent = D.one_line || "";
-
-  // ---------- horizon arc: 05:00 → 23:00
-  (function drawHorizon() {
-    const svg = $("horizon"), W = 1000, x0 = 30, x1 = 970, base = 132, lift = 104;
-    const start = 5 * 60, end = 23 * 60;
-    const X = (m) => x0 + (Math.min(Math.max(m, start), end) - start) / (end - start) * (x1 - x0);
-    const Y = (m) => base - Math.sin(Math.PI * (Math.min(Math.max(m, start), end) - start) / (end - start)) * lift;
-    let path = "";
-    for (let m = start; m <= end; m += 10) path += `${m === start ? "M" : "L"}${X(m).toFixed(1)},${Y(m).toFixed(1)}`;
-    const color = (t) => `var(--${TAGS[t] ? t : "rest"})`;
-    let out = `<line x1="${x0}" y1="${base}" x2="${x1}" y2="${base}" stroke="var(--line)" stroke-width="1.5"/>`;
-    out += `<path d="${path}" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 5" opacity=".7"/>`;
-    (D.day_plan || []).forEach((b) => {
-      const s = toMin(b.time), e = toMin(b.end) ?? (s + 30);
-      if (s == null) return;
-      out += `<rect x="${X(s).toFixed(1)}" y="${base + 6}" width="${Math.max(3, X(e) - X(s) - 2).toFixed(1)}" height="7" rx="3" fill="${color(b.tag)}" opacity=".85"><title>${esc(b.time + " " + b.title)}</title></rect>`;
-    });
-    [6, 9, 12, 15, 18, 21].forEach((hh) => { out += `<text x="${X(hh * 60)}" y="${base + 32}" text-anchor="middle">${String(hh).padStart(2, "0")}</text>`; });
-    const sm = isToday ? nowMin : 6 * 60;
-    const sx = X(sm), sy = Y(sm);
-    out += `<circle cx="${sx}" cy="${sy}" r="22" fill="var(--amber)" opacity=".16"/><circle cx="${sx}" cy="${sy}" r="11" fill="var(--amber)"/>`;
-    out += `<line x1="${sx}" y1="${sy + 12}" x2="${sx}" y2="${base}" stroke="var(--amber)" stroke-width="1" stroke-dasharray="2 3"/>`;
-    svg.innerHTML = out;
+  $("greeting").textContent = D.greeting || "";
+  const plan = D.day_plan || [];
+  (function horizon() {
+    const x0 = 30, x1 = 970, baseY = 112, lift = 88, start = 5 * 60, end = 23 * 60;
+    const clamp = (m) => Math.min(Math.max(m, start), end);
+    const X = (m) => x0 + (clamp(m) - start) / (end - start) * (x1 - x0);
+    const Y = (m) => baseY - Math.sin(Math.PI * (clamp(m) - start) / (end - start)) * lift;
+    let path = ""; for (let m = start; m <= end; m += 10) path += `${m === start ? "M" : "L"}${X(m).toFixed(1)},${Y(m).toFixed(1)}`;
+    let out = `<line x1="${x0}" y1="${baseY}" x2="${x1}" y2="${baseY}" stroke="var(--line)" stroke-width="1.5"/><path d="${path}" fill="none" stroke="var(--muted)" stroke-dasharray="3 5" opacity=".7"/>`;
+    plan.forEach((b) => { const s = toMin(b.time), e = toMin(b.end) ?? (s + 30); if (s == null) return;
+      out += `<rect x="${X(s).toFixed(1)}" y="${baseY + 6}" width="${Math.max(3, X(e) - X(s) - 2).toFixed(1)}" height="7" rx="3" fill="var(--${tagOf(b.tag)})" opacity=".85"><title>${esc(b.time + " " + b.title)}</title></rect>`; });
+    [6, 9, 12, 15, 18, 21].forEach((hh) => { out += `<text x="${X(hh * 60)}" y="${baseY + 32}" text-anchor="middle">${String(hh).padStart(2, "0")}</text>`; });
+    const sm = isToday ? nowMin : 7 * 60, sx = X(sm), sy = Y(sm);
+    out += `<circle cx="${sx}" cy="${sy}" r="20" fill="var(--amber)" opacity=".16"/><circle cx="${sx}" cy="${sy}" r="10" fill="var(--amber)"/><line x1="${sx}" y1="${sy + 11}" x2="${sx}" y2="${baseY}" stroke="var(--amber)" stroke-dasharray="2 3"/>`;
+    $("horizon").innerHTML = out;
   })();
-
-  const src = { "claude-cli": "Claude Code 구독", api: "Anthropic API", offline: "오프라인 내장 조언", manual: "미리보기" }[D.meta?.source] || D.meta?.source || "";
+  const src = { "claude-cli": "Claude Code", api: "Anthropic API", offline: "내장 조언", manual: "미리보기" }[D.meta?.source] || "";
   const chars = D.meta?.chapter_chars || (D.chapters || []).reduce((a, c) => a + (c.body_md || "").length, 0);
-  $("skyMeta").innerHTML = [
-    `오늘의 조언 <b class="num">${chars.toLocaleString()}</b>자`,
-    `최근 7일 대화 <b class="num">${(D.stats?.messages_recent ?? 0).toLocaleString()}</b>개를 읽음`,
-    src ? `생성 · ${esc(src)}` : "",
-  ].filter(Boolean).map((s) => `<span>${s}</span>`).join("");
+  $("skyMeta").innerHTML = [`조언 <b class="num">${chars.toLocaleString()}</b>자`,
+    `최근 7일 Claude 대화 <b class="num">${(D.stats?.messages_recent ?? 0).toLocaleString()}</b>개를 읽음`,
+    src ? `생성 · ${esc(src)}` : ""].filter(Boolean).map((s) => `<span>${s}</span>`).join("");
 
-  // ---------- three lines (editable)
+  // ---------- 2. today: 3 lines + top3
   ["reality", "wish", "choice"].forEach((k) => {
-    const el = $("l-" + k);
-    el.textContent = store.get("3-" + k, D.three_lines?.[k] || "");
+    const el = $("l-" + k); el.textContent = store.get("3-" + k, D.three_lines?.[k] || "");
     el.addEventListener("input", () => store.set("3-" + k, el.textContent));
   });
-  $("returnQ").textContent = D.return_question || "";
-  const bf = D.build_focus || {};
-  $("buildFocus").innerHTML = [["지금의 게이트", bf.gate], ["오늘 단 하나", bf.today_task], ["끝났다고 말할 기준", bf.metric]]
-    .filter((r) => r[1]).map((r) => `<div><dt>${r[0]}</dt><dd>${esc(r[1])}</dd></div>`).join("");
+  $("ret").innerHTML = D.return_question ? `<b>어제로부터의 질문</b> · ${esc(D.return_question)}` : "";
+  $("ret").hidden = !D.return_question;
+  let top3 = D.top3 || [];
+  if (!top3.length && D.build_focus) top3 = [{ tag: "build", text: D.build_focus.today_task, why: D.build_focus.metric }];
+  const todoDone = store.get("todo", {});
+  const renderTodoCount = () => { $("todoCount").textContent = `${top3.filter((_, i) => todoDone[i]).length} / ${top3.length}`; };
+  $("todo").innerHTML = top3.map((t, i) => `<li class="${todoDone[i] ? "checked" : ""}"><label for="todo-${i}">
+      <input type="checkbox" id="todo-${i}" data-i="${i}" ${todoDone[i] ? "checked" : ""}>
+      <span><span class="t"><span>${esc(t.text)}</span><span class="chip tag-${tagOf(t.tag)}">${TAGS[tagOf(t.tag)]}</span></span><span class="w">${esc(t.why || "")}</span></span></label></li>`).join("");
+  $("todo").addEventListener("change", (ev) => { const i = ev.target.dataset.i; todoDone[i] = ev.target.checked; ev.target.closest("li").classList.toggle("checked", ev.target.checked); store.set("todo", todoDone); renderTodoCount(); });
+  renderTodoCount();
 
-  // ---------- plan
+  // ---------- 3. flow + gates
   const planDone = store.get("plan", {});
-  const plan = D.day_plan || [];
-  const renderCount = () => { const n = plan.filter((_, i) => planDone[i]).length; $("planCount").textContent = `${n} / ${plan.length}`; };
+  const renderPlanCount = () => { $("planCount").textContent = `${plan.filter((_, i) => planDone[i]).length} / ${plan.length}`; };
   $("plan").innerHTML = plan.map((b, i) => {
     const s = toMin(b.time), e = toMin(b.end);
     const live = isToday && s != null && nowMin >= s && nowMin < (e ?? s + 60);
-    const tag = TAGS[b.tag] ? b.tag : "rest";
     return `<li class="${live ? "is-now" : ""}${planDone[i] ? " checked" : ""}" data-i="${i}">
-      <span class="t">${esc(b.time)}${b.end ? "–" + esc(b.end) : ""}</span>
+      <span class="tm">${esc(b.time)}${b.end ? "–" + esc(b.end) : ""}</span>
       <input type="checkbox" id="plan-${i}" ${planDone[i] ? "checked" : ""} aria-label="${esc(b.title)} 완료">
-      <div><div class="ttl"><span>${esc(b.title)}</span><span class="chip tag-${tag}">${TAGS[tag]}</span></div><div class="det">${esc(b.detail)}</div></div>
-    </li>`;
+      <div><div class="ttl"><span>${esc(b.title)}</span><span class="chip tag-${tagOf(b.tag)}">${TAGS[tagOf(b.tag)]}</span></div>${b.detail ? `<div class="det">${esc(b.detail)}</div>` : ""}</div></li>`;
   }).join("");
-  $("plan").addEventListener("change", (ev) => {
-    const li = ev.target.closest("li"); const i = +li.dataset.i;
-    planDone[i] = ev.target.checked; li.classList.toggle("checked", ev.target.checked); store.set("plan", planDone); renderCount();
-  });
-  renderCount();
-
-  // ---------- gates
-  const ms = D.milestones || [];
-  $("gates").innerHTML = ms.map((m) => {
-    let dd = "";
-    if (typeof m.dday === "number") dd = m.dday === 0 ? "D-DAY" : m.dday > 0 ? `D-${m.dday}` : `D+${-m.dday}`;
-    else if (m.status !== "done") dd = "날짜 미정";
+  $("plan").addEventListener("change", (ev) => { const li = ev.target.closest("li"); const i = +li.dataset.i; planDone[i] = ev.target.checked; li.classList.toggle("checked", ev.target.checked); store.set("plan", planDone); renderPlanCount(); });
+  renderPlanCount();
+  $("gates").innerHTML = (D.milestones || []).map((m) => {
+    let dd = ""; if (typeof m.dday === "number") dd = m.dday === 0 ? "D-DAY" : m.dday > 0 ? `D-${m.dday}` : `D+${-m.dday}`; else if (m.status !== "done") dd = "날짜 미정";
     const soon = typeof m.dday === "number" && m.dday >= 0 && m.dday <= 14;
-    const st = { done: "완료", now: "진행 중", next: "다음" }[m.status] || "";
-    return `<li data-s="${esc(m.status)}"><span class="dot" aria-hidden="true"></span>
-      <span class="g-title">${esc(m.title)}<span class="g-sub">${st}${m.track ? " · " + (m.track === "content" ? "콘텐츠" : "빌드") : ""}</span></span>
-      <span class="dday${soon ? " soon" : ""}">${dd}</span></li>`;
-  }).join("") || `<li><span></span><span class="g-title">config.json 에 milestones를 적어 주세요.</span></li>`;
+    return `<li data-s="${esc(m.status)}"><span class="dot" aria-hidden="true"></span><span class="g-title">${esc(m.title)}</span><span class="dday${soon ? " soon" : ""}">${dd}</span></li>`;
+  }).join("") || `<li><span></span><span class="g-title">config.json 의 milestones에 날짜를 적어 주세요.</span></li>`;
 
-  // ---------- stats
-  const S = D.stats || {};
-  $("statsRange").textContent = "최근 14일";
-  $("tiles").innerHTML = [
-    [S.sessions_recent ?? 0, "7일 세션"],
-    [S.messages_recent ?? 0, "7일 내 메시지"],
-    [S.active_days_period ?? 0, "30일 중 활동일"],
-  ].map(([n, l]) => `<div class="tile"><span class="n">${Number(n).toLocaleString()}</span><span class="l">${l}</span></div>`).join("");
-  (function spark() {
-    const days = S.daily || []; if (!days.length) return;
-    const W = 320, H = 78, pad = 6, top = 8, bottom = 60;
-    const max = Math.max(1, ...days.map((d) => d.count));
-    const X = (i) => pad + i * (W - pad * 2) / (days.length - 1 || 1);
-    const Yv = (v) => bottom - (v / max) * (bottom - top);
-    let line = days.map((d, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Yv(d.count).toFixed(1)}`).join("");
-    const area = `${line}L${X(days.length - 1)},${bottom}L${X(0)},${bottom}Z`;
-    const last = days[days.length - 1];
-    let out = `<line x1="${pad}" y1="${bottom}" x2="${W - pad}" y2="${bottom}" stroke="var(--line)"/>`;
-    out += `<line x1="${pad}" y1="${top}" x2="${W - pad}" y2="${top}" stroke="var(--line)" stroke-dasharray="2 4"/>`;
-    out += `<path d="${area}" fill="var(--build)" opacity=".12"/><path d="${line}" fill="none" stroke="var(--build)" stroke-width="2" stroke-linejoin="round"/>`;
-    out += `<circle cx="${X(days.length - 1)}" cy="${Yv(last.count)}" r="3.5" fill="var(--amber)"/>`;
-    out += `<text x="${pad}" y="${H - 4}">${days[0].date.slice(5).replace("-", "/")}</text><text x="${W - pad}" y="${H - 4}" text-anchor="end">오늘 ${last.count}</text>`;
-    out += `<text x="${W - pad}" y="${top - 1}" text-anchor="end" dy="-1">최대 ${max}</text>`;
-    $("spark").innerHTML = out;
-  })();
-  const hrs = S.hours || [];
-  const hmax = Math.max(1, ...hrs);
-  $("hours").innerHTML = hrs.map((v, i) => `<span style="height:${Math.max(4, (v / hmax) * 100)}%;${i < 5 || i >= 23 ? "background:var(--content)" : ""}" title="${i}시 · ${v}개"></span>`).join("");
-  $("tools").innerHTML = (S.top_tools || []).slice(0, 6).map(([n, c]) => `<span>${esc(n)} ${c}</span>`).join("");
+  // ---------- 4. radar
+  const R = D.radar || {};
+  const rm = R.meta || {};
+  $("radarMeta").textContent = rm.source === "web" ? `웹 검색 · ${String(rm.searched_at || "").replace("T", " ")}` : "검색 전 · 기본 목록";
+  const whenChip = (dateStr, fallback) => {
+    const n = daysTo(dateStr);
+    if (n === null) return `<span class="when">${esc(fallback || "확인 필요")}</span>`;
+    if (n < 0) return `<span class="when">진행 중</span>`;
+    return `<span class="when${n <= 7 ? " hot" : ""}">${n === 0 ? "오늘" : "D-" + n}</span>`;
+  };
+  const link = (u, label) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${label} ↗</a>` : "";
+  const cols = [
+    { title: "정부지원사업", tag: "build", items: R.grants || [], card: (g) => `<div class="top"><b>${esc(g.title)}</b>${whenChip(g.deadline, g.status)}</div>
+        <span class="org">${esc(g.org || "")}${g.deadline ? " · 마감 " + md(0, g.deadline) : ""}</span>${g.fit ? `<p>${esc(g.fit)}</p>` : ""}${g.action ? `<span class="act">${esc(g.action)}</span>` : ""}${link(g.url, "공고 보기")}` },
+    { title: "AI 교육", tag: "claude", items: R.ai_edu || [], card: (e) => `<div class="top"><b>${esc(e.title)}</b>${whenChip(e.date, e.date || "상시")}</div>
+        <span class="org">${esc([e.org, e.format, e.cost].filter(Boolean).join(" · "))}</span>${e.fit ? `<p>${esc(e.fit)}</p>` : ""}${link(e.url, "신청 보기")}` },
+    { title: "국내 일정 · 콘텐츠", tag: "content", items: R.events || [], card: (e) => `<div class="top"><b>${esc(e.title)}</b>${whenChip(e.date_start, "이달 시즌")}</div>
+        <span class="org">${esc([e.place, e.date_start ? md(0, e.date_start) + (e.date_end ? "–" + md(0, e.date_end) : "") : ""].filter(Boolean).join(" · "))}</span>${e.fit ? `<p>${esc(e.fit)}</p>` : ""}${e.shot ? `<span class="act">${esc(e.shot)}</span>` : ""}${link(e.url, "일정 보기")}` },
+  ];
+  $("radar").innerHTML = cols.map((c) => `<div class="col"><h3><span class="chip tag-${c.tag}">${TAGS[c.tag]}</span>${c.title}<span class="n">${c.items.length}</span></h3>
+      ${c.items.length ? c.items.map((it) => `<div class="item">${c.card(it)}</div>`).join("") : `<div class="radar-empty">오늘은 새로 찾은 항목이 없습니다.</div>`}</div>`).join("")
+    + (rm.note ? `<div class="radar-empty" style="grid-column:1/-1">${esc(rm.note)}</div>` : "");
 
-  // ---------- chapters
-  function md(src) {
+  // ---------- 5. advice tabs
+  function mdToHtml(src) {
     const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
-    const lines = String(src || "").split(/\r?\n/); let html = "", list = null, para = [];
-    const flush = () => { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } if (list) { html += `</${list}>`; list = null; } };
-    for (const raw of lines) {
-      const l = raw.trim();
-      if (!l) { flush(); continue; }
-      let m;
-      if ((m = /^#{2,4}\s+(.*)/.exec(l))) { flush(); html += `<h3>${inline(m[1])}</h3>`; }
-      else if ((m = /^>\s?(.*)/.exec(l))) { flush(); html += `<blockquote>${inline(m[1])}</blockquote>`; }
-      else if ((m = /^[-*]\s+(.*)/.exec(l))) { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } if (list !== "ul") { if (list) html += `</${list}>`; html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
-      else if ((m = /^\d+[.)]\s+(.*)/.exec(l))) { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } if (list !== "ol") { if (list) html += `</${list}>`; html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
-      else { if (list) { html += `</${list}>`; list = null; } para.push(l); }
+    let html = "", list = null, para = [];
+    const endPara = () => { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } };
+    const endList = () => { if (list) { html += `</${list}>`; list = null; } };
+    for (const raw of String(src || "").split(/\r?\n/)) {
+      const l = raw.trim(); let m;
+      if (!l) { endPara(); endList(); }
+      else if ((m = /^#{2,4}\s+(.*)/.exec(l))) { endPara(); endList(); html += `<h3>${inline(m[1])}</h3>`; }
+      else if ((m = /^>\s?(.*)/.exec(l))) { endPara(); endList(); html += `<blockquote>${inline(m[1])}</blockquote>`; }
+      else if ((m = /^[-*]\s+(.*)/.exec(l))) { endPara(); if (list !== "ul") { endList(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = /^\d+[.)]\s+(.*)/.exec(l))) { endPara(); if (list !== "ol") { endList(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
+      else { endList(); para.push(l); }
     }
-    flush(); return html;
+    endPara(); endList(); return html;
   }
   const chapters = D.chapters || [];
   const actDone = store.get("actions", {});
-  $("chapters").innerHTML = chapters.map((c, ci) => {
-    const tag = TAGS[c.id] ? c.id : "rest";
-    return `<article class="chapter" id="ch-${esc(c.id || ci)}">
-      <header><span class="label tag-${tag}">${esc(c.kicker || TAGS[tag])}</span><h2>${esc(c.title)}</h2></header>
-      ${c.evidence ? `<div class="evidence"><span class="label">범님의 대화에서</span><span>${esc(c.evidence)}</span></div>` : ""}
-      <div class="prose">${md(c.body_md)}</div>
-      ${(c.actions || []).length ? `<ul class="actions">${c.actions.map((a, ai) => { const k = ci + "-" + ai; return `<li class="${actDone[k] ? "checked" : ""}"><label><input type="checkbox" id="act-${k}" data-k="${k}" ${actDone[k] ? "checked" : ""}><span>${esc(a)}</span></label></li>`; }).join("")}</ul>` : ""}
-    </article>`;
-  }).join("");
-  $("chapters").addEventListener("change", (ev) => {
-    const k = ev.target.dataset.k; if (!k) return;
-    actDone[k] = ev.target.checked; ev.target.closest("li").classList.toggle("checked", ev.target.checked); store.set("actions", actDone);
-  });
-  $("toc").innerHTML = chapters.map((c, ci) => `<a href="#ch-${esc(c.id || ci)}" data-i="${ci}"><small>${esc(TAGS[c.id] || "")}</small>${esc(c.title)}</a>`).join("") + `<div class="progress" aria-hidden="true"><i id="prog"></i></div>`;
-  const tocLinks = [...document.querySelectorAll("#toc a")];
-  const arts = [...document.querySelectorAll(".chapter")];
-  const onScroll = () => {
-    let active = 0;
-    arts.forEach((a, i) => { if (a.getBoundingClientRect().top < window.innerHeight * 0.35) active = i; });
-    tocLinks.forEach((l, i) => l.classList.toggle("active", i === active));
-    if (arts.length) {
-      const first = arts[0].getBoundingClientRect().top + window.scrollY, last = arts[arts.length - 1];
-      const endY = last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
-      const p = Math.min(1, Math.max(0, (window.scrollY - first + 200) / Math.max(1, endY - first + 200)));
-      const prog = $("prog"); if (prog) prog.style.width = (p * 100).toFixed(1) + "%";
+  const cm = D.content_mission || {};
+  const shotsDone = store.get("shots", {});
+  function extras(id) {
+    if (id === "content") {
+      return `<div class="extra">${cm.question ? `<h4>오늘 품고 다닐 질문</h4><p class="q">${esc(cm.question)}</p>` : ""}
+        ${(cm.shots || []).length ? `<h4>5-shot · Moment가 걸릴 때만</h4><ul class="shots">${cm.shots.map((s, i) => `<li><label class="shot${shotsDone[i] ? " on" : ""}" for="shot-${i}"><input type="checkbox" id="shot-${i}" data-shot="${i}" ${shotsDone[i] ? "checked" : ""}><b>${esc(s.key)}</b><span>${esc(s.hint)}</span></label></li>`).join("")}</ul>` : ""}
+        ${(cm.voice_memo || []).length ? `<h4>경험 10~30분 뒤 · 60초 Voice Memo</h4><ol class="plain">${cm.voice_memo.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>` : ""}
+        ${cm.episode_seed ? `<h4>이번 주 에피소드 씨앗</h4><p class="plain" style="padding:0">${esc(cm.episode_seed)}</p>` : ""}</div>`;
     }
-  };
-  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
-
-  // ---------- claude tips
-  $("tips").innerHTML = (D.claude_code || []).map((t, i) => `<article class="tip">
-      <h3>${esc(t.title)}</h3><p class="why">${esc(t.why)}</p><p class="how">${esc(t.how)}</p>
-      ${t.prompt ? `<pre class="prompt-box" id="pr-${i}">${esc(t.prompt)}</pre><button class="copy" type="button" data-i="${i}">프롬프트 복사</button>` : ""}
-    </article>`).join("");
-  $("tips").addEventListener("click", async (ev) => {
-    const b = ev.target.closest(".copy"); if (!b) return;
-    const box = $("pr-" + b.dataset.i);
+    if (id === "claude" && (D.claude_code || []).length) {
+      return `<div class="extra"><h4>복사해서 바로 쓰는 프롬프트</h4><div class="tips">${D.claude_code.map((t, i) => `<div class="tip"><b>${esc(t.title)}</b><p>${esc(t.why)}</p><p>${esc(t.how)}</p>
+        ${t.prompt ? `<pre class="prompt-box" id="pr-${i}">${esc(t.prompt)}</pre><button class="copy" type="button" data-copy="${i}">프롬프트 복사</button>` : ""}</div>`).join("")}</div></div>`;
+    }
+    if (id === "rhythm" && (D.watchouts || []).length) {
+      return `<div class="extra"><h4>오늘 조심할 패턴</h4><ul class="plain">${D.watchouts.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>`;
+    }
+    return "";
+  }
+  let active = 0; try { active = Math.min(chapters.length - 1, Math.max(0, +(sessionStorage.getItem("onmoment:tab") || 0))); } catch (e) {}
+  function showTab(i) {
+    active = i; try { sessionStorage.setItem("onmoment:tab", i); } catch (e) {}
+    [...$("tabs").children].forEach((b, j) => b.setAttribute("aria-selected", String(j === i)));
+    const c = chapters[i]; if (!c) return;
+    $("chapter").innerHTML = `<article class="chapter" role="tabpanel"><span class="label tag-${tagOf(c.id)}">${esc(c.kicker || "")}</span>
+      <h3 class="ch-title">${esc(c.title)}</h3>
+      ${c.evidence ? `<div class="evidence">${esc(c.evidence)}</div>` : ""}
+      <div class="prose">${mdToHtml(c.body_md)}</div>
+      ${(c.actions || []).length ? `<ul class="actions">${c.actions.map((a, ai) => { const k = i + "-" + ai; return `<li class="${actDone[k] ? "checked" : ""}"><label><input type="checkbox" id="act-${k}" data-act="${k}" ${actDone[k] ? "checked" : ""}><span>${esc(a)}</span></label></li>`; }).join("")}</ul>` : ""}
+      ${extras(c.id)}</article>`;
+  }
+  const TAB_NAMES = { life: "온순간을 산다", build: "비즈니스", content: "콘텐츠", claude: "Claude Code", rhythm: "리듬" };
+  $("tabs").innerHTML = chapters.map((c, i) => `<button class="tab" role="tab" type="button" data-tab="${i}">${esc(TAB_NAMES[c.id] || c.kicker || c.title)}</button>`).join("");
+  $("tabs").addEventListener("click", (ev) => { const b = ev.target.closest("[data-tab]"); if (b) showTab(+b.dataset.tab); });
+  $("chapter").addEventListener("change", (ev) => {
+    const t = ev.target;
+    if (t.dataset.act) { actDone[t.dataset.act] = t.checked; t.closest("li").classList.toggle("checked", t.checked); store.set("actions", actDone); }
+    if (t.dataset.shot) { shotsDone[t.dataset.shot] = t.checked; t.closest(".shot").classList.toggle("on", t.checked); store.set("shots", shotsDone); }
+  });
+  $("chapter").addEventListener("click", async (ev) => {
+    const b = ev.target.closest("[data-copy]"); if (!b) return;
+    const box = $("pr-" + b.dataset.copy);
     try { await navigator.clipboard.writeText(box.textContent); b.textContent = "복사됨"; }
     catch (e) { const r = document.createRange(); r.selectNodeContents(box); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "선택됨 · Ctrl+C"; }
     setTimeout(() => (b.textContent = "프롬프트 복사"), 1800);
   });
+  if (chapters.length) showTab(active);
 
-  // ---------- content mission
-  const cm = D.content_mission || {};
-  $("missionQ").textContent = cm.question || "";
-  const shotsDone = store.get("shots", {});
-  $("shots").innerHTML = (cm.shots || []).map((s, i) => `<li><label class="shot${shotsDone[i] ? " on" : ""}" for="shot-${i}"><input type="checkbox" id="shot-${i}" data-i="${i}" ${shotsDone[i] ? "checked" : ""}><b>${esc(s.key)}</b><span>${esc(s.hint)}</span></label></li>`).join("");
-  $("shots").addEventListener("change", (ev) => { const i = ev.target.dataset.i; shotsDone[i] = ev.target.checked; ev.target.closest(".shot").classList.toggle("on", ev.target.checked); store.set("shots", shotsDone); });
-  $("seed").innerHTML = cm.episode_seed ? `<span class="label">이번 주 에피소드 씨앗</span><div>${esc(cm.episode_seed)}</div>` : "";
-  $("seed").hidden = !cm.episode_seed;
-  $("memo").innerHTML = (cm.voice_memo || []).map((q) => `<li>${esc(q)}</li>`).join("");
-  $("watch").innerHTML = (D.watchouts || []).map((w) => `<li>${esc(w)}</li>`).join("");
-
-  // ---------- evening return
-  const ev = D.evening || [];
+  // ---------- 6. evening
+  const evq = D.evening || [];
   const answers = store.get("evening", {});
-  $("evening").innerHTML = ev.map((q, i) => `<label for="ev-${i}">${esc(q)}<textarea id="ev-${i}" data-i="${i}" placeholder="짧게, 있는 그대로.">${esc(answers[i] || "")}</textarea></label>`).join("") +
+  $("evening").innerHTML = evq.map((q, i) => `<label for="ev-${i}">${esc(q)}<textarea id="ev-${i}" data-i="${i}" placeholder="짧게, 있는 그대로.">${esc(answers[i] || "")}</textarea></label>`).join("") +
     `<div class="row-btns"><button class="btn" type="submit">Return 파일로 저장</button><button class="btn ghost" type="button" id="copyReturn">텍스트 복사</button><span class="status" id="evStatus">입력은 이 컴퓨터에 자동 저장됩니다.</span></div>`;
   $("evening").addEventListener("input", (e) => { const i = e.target.dataset.i; if (i == null) return; answers[i] = e.target.value; store.set("evening", answers); });
   const returnText = () => {
     const three = ["reality", "wish", "choice"].map((k) => $("l-" + k).textContent.trim());
-    const planN = plan.filter((_, i) => planDone[i]).length;
-    return `# 온순간 Return · ${D.date}\n\n## 오늘의 3줄\n- 현재: ${three[0]}\n- 바람: ${three[1]}\n- 선택: ${three[2]}\n\n## 흐름\n- 완료한 블록: ${planN} / ${plan.length}\n` +
-      plan.map((b, i) => `  - [${planDone[i] ? "x" : " "}] ${b.time} ${b.title}`).join("\n") +
-      `\n\n## 밤 3분\n` + ev.map((q, i) => `### ${q}\n${(answers[i] || "").trim() || "(비움)"}\n`).join("\n");
+    return `# 온순간 Return · ${D.date}\n\n## 오늘의 3줄\n- 현재: ${three[0]}\n- 바람: ${three[1]}\n- 선택: ${three[2]}\n\n## 오늘 꼭 할 3가지\n` +
+      top3.map((t, i) => `- [${todoDone[i] ? "x" : " "}] ${t.text}`).join("\n") +
+      `\n\n## 흐름 (${plan.filter((_, i) => planDone[i]).length} / ${plan.length})\n` + plan.map((b, i) => `- [${planDone[i] ? "x" : " "}] ${b.time} ${b.title}`).join("\n") +
+      `\n\n## 밤 3분\n` + evq.map((q, i) => `### ${q}\n${(answers[i] || "").trim() || "(비움)"}\n`).join("\n");
   };
   $("evening").addEventListener("submit", (e) => {
     e.preventDefault();
-    const blob = new Blob([returnText()], { type: "text/markdown;charset=utf-8" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `onmoment-return-${D.date}.md`;
-    document.body.appendChild(a); a.click(); a.remove();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([returnText()], { type: "text/markdown;charset=utf-8" }));
+    a.download = `onmoment-return-${D.date}.md`; document.body.appendChild(a); a.click(); a.remove();
     $("evStatus").textContent = "다운로드 폴더에 저장했습니다. 내일 아침 조언이 이 기록을 읽습니다.";
   });
   $("copyReturn").addEventListener("click", async () => {

@@ -50,10 +50,16 @@ def expand(p: str) -> Path:
 
 def load_config() -> dict:
     cfg_path = HERE / "config.json"
+    example = HERE / "config.example.json"
     if not cfg_path.exists():
-        shutil.copy(HERE / "config.example.json", cfg_path)
+        shutil.copy(example, cfg_path)
     with open(cfg_path, encoding="utf-8") as f:
-        return json.load(f)
+        cfg = json.load(f)
+    with open(example, encoding="utf-8") as f:
+        defaults = json.load(f)
+    for key, value in defaults.items():  # 업데이트로 새로 생긴 설정은 기본값으로 채운다
+        cfg.setdefault(key, value)
+    return cfg
 
 
 def log(data_dir: Path, msg: str) -> None:
@@ -274,8 +280,11 @@ SCHEMA = r"""{
     "wish": "바람(B) — 범님이 스스로 말한 바라는 장면 한 줄 (범님의 말을 최대한 그대로)",
     "choice": "선택(Bridge) — 오늘 통제 가능한 작은 한 행동 한 줄"
   },
+  "top3": [
+    {"tag": "life|build|content", "text": "오늘 꼭 할 일 한 줄 (동사로 끝나게, 30자 안팎)", "why": "왜 오늘인지 한 줄"}
+  ],
   "day_plan": [
-    {"time": "06:00", "end": "06:30", "title": "블록 제목", "detail": "구체적으로 무엇을, 어떤 결과물까지", "tag": "life|build|content|claude|rest"}
+    {"time": "06:00", "end": "07:00", "title": "블록 제목", "detail": "이 블록에서 오늘 할 구체적인 한 가지", "tag": "life|build|content|claude|rest"}
   ],
   "build_focus": {"gate": "지금 통과하려는 게이트", "today_task": "오늘 이 게이트를 위해 할 단 하나", "metric": "오늘 끝났다고 말할 수 있는 기준"},
   "content_mission": {
@@ -290,7 +299,7 @@ SCHEMA = r"""{
       "kicker": "짧은 머리말 (예: 01 · 온순간을 산다)",
       "title": "장 제목",
       "evidence": "이 조언의 근거가 된 범님의 실제 대화/기록 — 날짜와 함께 짧게 인용",
-      "body_md": "본문 (마크다운: 문단, **굵게**, - 목록, > 인용, ### 소제목). 장당 1,100~1,600자",
+      "body_md": "본문 (마크다운: 문단, **굵게**, - 목록, > 인용, ### 소제목). 장당 1,000~1,400자",
       "actions": ["오늘 할 수 있는 구체 행동 3개"]
     }
   ],
@@ -329,18 +338,22 @@ PROMPT = """당신은 김범(범님)의 아침 동반자다. 범님은 온순간
 어제 조언의 선택: {yesterday_choice}
 {returns}
 
-# 입력 5 — Claude Code 사용 통계 (최근 {stats_days}일)
+# 입력 5 — 오늘({weekday}요일)의 기본 리듬 (범님이 직접 설계한 요일별 일과)
+{rhythm}
+
+# 입력 6 — Claude Code 사용 통계 (최근 {stats_days}일)
 {stats}
 
-# 입력 6 — 범님이 최근 Claude와 나눈 대화 (범님이 쓴 메시지만, 시간순)
+# 입력 7 — 범님이 최근 Claude와 나눈 대화 (범님이 쓴 메시지만, 시간순)
 {history}
 
 # 과제
 위 입력을 근거로, 오늘 하루를 위한 조언 대시보드 데이터를 만든다.
 - chapters는 정확히 5개, 이 순서: life(온순간을 산다 — 자기·관계·신앙), build(온순간 비즈니스 빌드업 — 모두의창업 게이트), content(온순간 콘텐츠 실행 — Creator OS), claude(Claude Code를 더 잘 쓰는 법), rhythm(오늘의 리듬 — 에너지·쉼·가족).
-- 5개 장의 body_md 합계는 반드시 한국어 6,000자 이상. 일반론 금지, 최근 대화에서 나온 구체적 장면·결정·고민을 짚을 것.
+- 5개 장의 body_md 합계는 반드시 한국어 5,500자 이상. 문장은 짧고 쉽게. 일반론 금지, 최근 대화에서 나온 구체적 장면·결정·고민을 짚을 것.
 - 각 장의 evidence에는 실제 대화 근거를 날짜와 함께 인용. 근거가 없으면 "최근 대화에는 이 주제가 없었습니다"라고 솔직히 쓰고 문서 기반으로 조언.
-- day_plan은 06:00부터 22:30까지 7~10개 블록. 깊은 일 블록(90분)은 오전에, 가족·쉼·밤 3분 Return 포함.
+- day_plan은 입력 5의 기본 리듬 블록을 그대로 쓰고(시간·제목 유지), 각 블록의 detail에 오늘 그 시간에 할 구체적인 한 가지를 채운다. 리듬을 바꿔야 할 이유가 있으면 한 블록만 바꾸고 detail에 이유를 쓴다.
+- top3는 정확히 3개: 오늘 꼭 할 일(life 1, build 1, content 1). 모두 day_plan의 어느 블록에서 할지 떠올릴 수 있게.
 - claude_code는 4개. 통계(도구 사용·세션 길이·프로젝트)와 대화 내용에서 보이는 실제 병목에 맞춘 팁. 슬래시 명령, CLAUDE.md, 서브에이전트, plan mode, hooks, skills, headless(claude -p), worktree 등에서 지금 범님에게 가장 효과 큰 것.
 - build_focus는 모두의창업 게이트 중 지금 가장 중요한 것 하나.
 - memory_update에는 오늘 대화에서 새로 확인된 사실만 (추측 금지).
@@ -362,8 +375,124 @@ def build_prompt(cfg: dict, today: dt.date, context: str, milestones: list[dict]
         context=context or "(없음)", milestones="\n".join(ms_lines) or "(없음)",
         memory=memory or "(아직 없음 — 첫 아침)", yesterday_choice=yesterday_choice or "(없음)",
         returns=returns or "(어젯밤 Return 기록 없음)", stats_days=cfg["history"]["stats_days"],
-        stats=stats_text, history=history, schema=SCHEMA,
+        stats=stats_text, history=history, schema=SCHEMA, rhythm=rhythm_text(today_rhythm(cfg, today)),
     )
+
+
+# ---------------------------------------------------------------- weekly rhythm
+
+DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
+
+def today_rhythm(cfg: dict, today: dt.date) -> list[dict]:
+    blocks = (cfg.get("weekly_rhythm") or {}).get(DAY_KEYS[today.weekday()]) or []
+    return [dict(b) for b in blocks]
+
+
+def rhythm_text(blocks: list[dict]) -> str:
+    return "\n".join(f"- {b['time']}~{b.get('end', '')} [{b.get('tag', '')}] {b['title']}" for b in blocks) or "(설정 없음)"
+
+
+# ---------------------------------------------------------------- radar (웹 검색)
+
+RADAR_SCHEMA = r"""{
+  "grants": [
+    {"title": "사업/공고명", "org": "주관 기관", "deadline": "YYYY-MM-DD 또는 null(상시)", "status": "접수중|접수예정|상시",
+     "fit": "온순간에 왜 맞는지 한 줄", "action": "범님이 오늘 할 한 가지", "url": "공고 페이지 URL"}
+  ],
+  "ai_edu": [
+    {"title": "교육명", "org": "기관", "date": "시작일 YYYY-MM-DD 또는 '상시'", "format": "온라인|오프라인(장소)", "cost": "무료|유료(금액)",
+     "fit": "범님에게 왜 맞는지 한 줄", "url": "신청 페이지 URL"}
+  ],
+  "events": [
+    {"title": "행사/장소명", "place": "지역", "date_start": "YYYY-MM-DD", "date_end": "YYYY-MM-DD",
+     "fit": "온순간 콘텐츠로 어떤 질문을 열 수 있는지 한 줄", "shot": "찍어 올 한 장면", "url": "공식 페이지 URL"}
+  ]
+}"""
+
+RADAR_PROMPT = """당신은 김범(범님)의 리서치 비서다. 오늘은 {today} ({weekday}요일).
+범님은 1인 창업자로 '온순간'을 만든다: AI가 판정하지 않고 가능성을 비추는 자기코칭 커뮤니티
+(현재·바람·선택 3줄 카드 → 실제로 살아보기), 부모교육·은퇴교육·리트릿 기관이 비용을 내는 B2B2C,
+소셜벤처 지향, 얼굴 없는 여행·사람 이야기 유튜브 채널 준비 중. 거주·활동 지역: {region}.
+법인 설립 전(예비창업자) ~ 초기, 모두의창업(경기콘텐츠진흥원) 참여 중.
+
+웹 검색으로 아래 세 가지를 찾아라. 검색 결과에서 실제로 확인한 것만 쓴다.
+모든 항목에 실제 공고·신청·행사 페이지 URL을 넣는다. 마감·종료가 지난 것은 뺀다. 날짜를 확인 못 했으면 넣지 않는다.
+
+1. grants (3~5개): 온순간 비즈니스화에 도움이 될 정부·지자체·공공기관 지원사업.
+   지금 접수 중이거나 30일 안에 접수가 열리는 것. 예: K-Startup 사업공고, 기업마당, 경기콘텐츠진흥원,
+   경기도경제과학진흥원, 창업진흥원, 한국사회적기업진흥원(소셜벤처), 중소벤처기업부, 콘텐츠진흥원, 시니어·평생교육 관련 공모.
+   마감이 가까운 순서로.
+2. ai_edu (2~4개): 범님이 들을 만한 AI 교육. 무료 또는 정부지원 우선. AI 에이전트·바이브코딩·Claude Code·
+   AI 영상/콘텐츠 제작·AI 창업 관련. 30일 안에 시작하거나 상시 모집.
+3. events (3~5개): 앞으로 14일 안에 열리는 국내 행사·축제·걷기길 시즌 중
+   온순간 콘텐츠(사람·질문·걷기·순례·가족·자연)에 맞는 것. 아래는 범님이 직접 만든 이달의 후보 목록이다.
+   이 목록을 우선 검토하고 실제 일정은 검색으로 확인한다. 주말에 갈 만한 것 우선.
+{places}
+
+설명·머리말·코드블록 없이 아래 스키마의 JSON 객체 하나만 출력한다.
+{schema}
+"""
+
+FALLBACK_GRANTS = [
+    {"title": "K-Startup 사업공고 (진행 중)", "org": "창업진흥원", "deadline": None, "status": "상시",
+     "fit": "예비·초기창업 지원사업이 가장 먼저 올라오는 곳", "action": "'예비창업' · '소셜' · '콘텐츠'로 필터해 보기",
+     "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do"},
+    {"title": "기업마당 지원사업 공고", "org": "중소벤처기업부", "deadline": None, "status": "상시",
+     "fit": "정부·지자체 지원사업을 한곳에서 검색", "action": "지역 '경기'와 분야 '창업'으로 검색",
+     "url": "https://www.bizinfo.go.kr"},
+    {"title": "경기콘텐츠진흥원 사업공고", "org": "경기콘텐츠진흥원", "deadline": None, "status": "상시",
+     "fit": "모두의창업 주관기관. 콘텐츠·창업 후속 지원", "action": "후속 지원·멘토링 공고 확인",
+     "url": "https://www.gcon.or.kr"},
+]
+FALLBACK_AI_EDU = [
+    {"title": "K-MOOC 인공지능 강좌", "org": "국가평생교육진흥원", "date": "상시", "format": "온라인", "cost": "무료",
+     "fit": "기초부터 활용까지 무료 강좌", "url": "https://www.kmooc.kr"},
+    {"title": "지식(GSEEK) 경기도 평생학습", "org": "경기도", "date": "상시", "format": "온라인", "cost": "무료",
+     "fit": "경기도민 무료 AI·디지털 강좌", "url": "https://www.gseek.kr"},
+    {"title": "HRD-Net 국민내일배움카드 과정", "org": "고용노동부", "date": "상시", "format": "온라인·오프라인", "cost": "지원",
+     "fit": "AI·바이브코딩 과정 검색", "url": "https://www.hrd.go.kr"},
+]
+
+
+def load_places(month: int) -> list[str]:
+    import csv
+
+    path = HERE / "data" / "places_kr.csv"
+    if not path.exists():
+        return []
+    with open(path, encoding="utf-8") as f:
+        return [row["place"] for row in csv.DictReader(f) if str(month) in row["months"].split()]
+
+
+def fallback_radar(today: dt.date, note: str = "") -> dict:
+    """검색을 못 한 날에도 레이더가 비지 않도록: 공식 포털 + 범님의 월별 목록."""
+    from urllib.parse import quote
+
+    places = load_places(today.month)
+    start = today.toordinal() % max(1, len(places)) if places else 0
+    picks = (places[start:] + places[:start])[:5]
+    events = [{"title": p.split(":")[0].strip(), "place": "", "date_start": None, "date_end": None,
+               "fit": (p.split(":", 1)[1].strip() if ":" in p else "범님의 이달 후보 목록에서"),
+               "shot": "", "url": "https://search.naver.com/search.naver?query=" + quote(p.split(":")[0].split("(")[0].strip() + f" {today.year}")}
+              for p in picks]
+    return {"grants": FALLBACK_GRANTS, "ai_edu": FALLBACK_AI_EDU, "events": events,
+            "meta": {"source": "offline", "note": note}}
+
+
+def run_radar(cfg: dict, today: dt.date) -> dict:
+    rc = cfg.get("radar") or {}
+    places = load_places(today.month) + [f"(다음 달) {p}" for p in load_places(today.month % 12 + 1)[:15]]
+    prompt = RADAR_PROMPT.format(
+        today=today.isoformat(), weekday=WEEKDAYS[today.weekday()], region=rc.get("region", "경기도"),
+        places="\n".join(f"- {p}" for p in places) or "(목록 없음)", schema=RADAR_SCHEMA)
+    raw = run_claude_cli(prompt, cfg.get("claude_cli_model", ""), int(rc.get("timeout_sec", 480)),
+                         tools=["WebSearch", "WebFetch"])
+    radar = parse_json(raw)
+    for key in ("grants", "ai_edu", "events"):
+        radar[key] = [x for x in radar.get(key) or [] if isinstance(x, dict) and x.get("title")]
+    radar["meta"] = {"source": "web", "searched_at": dt.datetime.now().isoformat(timespec="minutes")}
+    return radar
 
 
 # ---------------------------------------------------------------- engines
@@ -384,13 +513,15 @@ def find_claude() -> str | None:
     return next((str(c) for c in candidates if c.exists()), None)
 
 
-def run_claude_cli(prompt: str, model: str, timeout: int) -> str:
+def run_claude_cli(prompt: str, model: str, timeout: int, tools: list[str] | None = None) -> str:
     exe = find_claude()
     if not exe:
         raise RuntimeError("claude CLI를 찾지 못했습니다")
     cmd = [exe, "-p", "--output-format", "text"]
     if model:
         cmd += ["--model", model]
+    if tools:
+        cmd += ["--allowedTools", ",".join(tools)]
     windows = sys.platform.startswith("win")
     proc = subprocess.Popen(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -453,21 +584,28 @@ def api_available() -> bool:
         os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))
 
 
-def parse_brief(raw: str) -> dict:
+def parse_json(raw: str) -> dict:
     start, end = raw.find("{"), raw.rfind("}")
     if start < 0 or end <= start:
         raise ValueError("JSON을 찾지 못했습니다")
-    brief = json.loads(raw[start : end + 1])
+    return json.loads(raw[start : end + 1])
+
+
+def parse_brief(raw: str) -> dict:
+    brief = parse_json(raw)
     for key in ("one_line", "three_lines", "day_plan", "chapters"):
         if key not in brief:
             raise ValueError(f"'{key}' 항목이 없습니다")
     return brief
 
 
-def offline_brief(today: dt.date) -> dict:
+def offline_brief(today: dt.date, cfg: dict | None = None) -> dict:
     """LLM 없이도 창이 비지 않도록, 내장 조언을 날짜별로 회전시킨다."""
     with open(FALLBACK, encoding="utf-8") as f:
         brief = json.load(f)
+    rhythm = today_rhythm(cfg, today) if cfg else []
+    if rhythm:  # 범님이 설계한 요일별 리듬을 그대로 쓴다
+        brief["day_plan"] = rhythm
     rotation = brief.pop("rotation", {})
     i = today.toordinal()
     for key, pool in rotation.items():
@@ -595,6 +733,7 @@ def main() -> int:
     ai_msgs = collect_claude_ai(hist.get("claude_ai_export", ""), hist["recent_days"])
     stats["messages_claude_ai"] = len(ai_msgs)
     milestones = milestones_with_dday(cfg.get("milestones", []), today)
+    radar_state = {"radar": fallback_radar(today)}
 
     def finish(brief: dict, source: str, target: Path) -> None:
         brief.setdefault("meta", {})
@@ -602,12 +741,14 @@ def main() -> int:
                               "chapter_chars": chapter_chars(brief)})
         brief.update({"date": today.isoformat(), "weekday": WEEKDAYS[today.weekday()], "name": cfg.get("name", "범"),
                       "stats": stats, "milestones": milestones})
+        brief.setdefault("radar", radar_state["radar"])
         render(brief, target)
 
     if args.render:
         with open(args.render, encoding="utf-8") as f:
             brief = json.load(f)
         brief.pop("rotation", None)
+        brief.setdefault("day_plan", today_rhythm(cfg, today))
         out = Path(args.out) if args.out else window
         finish(brief, brief.get("meta", {}).get("source", "manual"), out)
         print(f"렌더 완료: {out}")
@@ -622,9 +763,11 @@ def main() -> int:
         log(data_dir, "오늘 조언이 이미 있어 창만 열었습니다")
         return 0
 
-    timeout = int(cfg.get("claude_timeout_sec", 360))
+    timeout = int(cfg.get("claude_timeout_sec", 420))
+    radar_cfg = cfg.get("radar") or {}
+    radar_timeout = int(radar_cfg.get("timeout_sec", 480))
     lock = data_dir / ".lock"
-    if not acquire_lock(lock, timeout + 120):
+    if not acquire_lock(lock, max(timeout, radar_timeout) + 120):
         log(data_dir, "다른 생성 작업이 진행 중입니다")
         if not args.no_open and window.exists():
             open_window(window, mode)
@@ -632,8 +775,8 @@ def main() -> int:
 
     def show_offline(pending: bool, note: str = "") -> dict:
         """창이 절대 빈 대기 화면에 갇히지 않도록, 내장 조언을 먼저 그려 둔다."""
-        brief = offline_brief(today)
-        brief["meta"] = {"pending": pending, "note": note, "timeout": timeout}
+        brief = offline_brief(today, cfg)
+        brief["meta"] = {"pending": pending, "note": note, "timeout": max(timeout, radar_timeout)}
         finish(brief, "offline", window)
         return brief
 
@@ -642,6 +785,25 @@ def main() -> int:
         if not args.no_open and not args.offline:
             show_offline(pending=True)
             open_window(window, mode)
+
+        # 레이더(웹 검색)는 조언 생성과 동시에 돈다
+        import threading
+
+        def radar_job() -> None:
+            try:
+                radar_state["radar"] = run_radar(cfg, today)
+                log(data_dir, "레이더 검색 완료")
+            except subprocess.TimeoutExpired:
+                radar_state["radar"] = fallback_radar(today, f"검색이 {radar_timeout}초 안에 끝나지 않았습니다")
+                log(data_dir, "레이더 검색 시간 초과")
+            except Exception as e:
+                radar_state["radar"] = fallback_radar(today, f"검색 실패: {e}"[:200])
+                log(data_dir, f"레이더 검색 실패: {e}")
+
+        radar_thread = None
+        if radar_cfg.get("enabled", True) and not args.offline and find_claude():
+            radar_thread = threading.Thread(target=radar_job, daemon=True)
+            radar_thread.start()
 
         memory_path = data_dir / "memory.md"
         memory = memory_path.read_text(encoding="utf-8")[-6000:] if memory_path.exists() else ""
@@ -680,8 +842,10 @@ def main() -> int:
                 notes.append(f"{name}: {e}")
                 log(data_dir, f"{name} 엔진 실패: {e}")
 
+        if radar_thread is not None:
+            radar_thread.join(radar_timeout + 30)
         if brief is None:
-            brief = offline_brief(today)
+            brief = offline_brief(today, cfg)
             brief["meta"] = {"note": " / ".join(notes)[:400] if notes else ""}
         if source == "offline" and not args.offline:
             # Claude 연결이 안 된 날은 '완성본'으로 저장하지 않아, 다음 실행(로그인 등)에서 다시 시도한다
@@ -689,6 +853,7 @@ def main() -> int:
             log(data_dir, "Claude 조언을 받지 못해 내장 조언을 보여주었습니다 (다음 실행 때 다시 시도)")
             return 0
         finish(brief, source, today_html)
+        brief["radar"] = radar_state["radar"]
         today_json.write_text(json.dumps(brief, ensure_ascii=False, indent=2), encoding="utf-8")
         shutil.copy(today_html, window)
         log(data_dir, f"생성 완료 ({source}, 본문 {chapter_chars(brief):,}자)")

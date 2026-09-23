@@ -10,80 +10,73 @@
   "day_plan": [
     {
       "time": "06:00",
-      "end": "06:20",
-      "title": "이 창을 열고, 3줄만 내 말로",
-      "detail": "끝까지 읽지 않아도 됩니다. 3줄 카드를 범님의 말로 고치고, 오늘의 질문 하나만 휴대폰 메모에 옮깁니다.",
-      "tag": "life"
-    },
-    {
-      "time": "06:20",
       "end": "07:00",
-      "title": "걷기와 기도",
-      "detail": "휴대폰은 주머니에. Pocket 4P는 챙기되 Moment가 걸릴 때만 꺼냅니다.",
-      "tag": "life"
+      "title": "기도 · 아침 · 스트레칭",
+      "tag": "life",
+      "detail": "이 창을 열고 3줄만 범님의 말로 고칩니다."
     },
     {
       "time": "07:00",
-      "end": "07:40",
-      "title": "가족 아침",
-      "detail": "조언 대신 질문 하나. 누군가 말을 시작하면 오늘의 선택, 첫 60초 듣기.",
-      "tag": "rest"
+      "end": "09:00",
+      "title": "자전거 · 러닝 + 말씀",
+      "tag": "life",
+      "detail": "휴대폰은 주머니에. Moment가 걸릴 때만 카메라."
     },
     {
-      "time": "08:30",
-      "end": "10:00",
-      "title": "딥워크 · 'Insight'를 무엇으로 셀지 정의",
-      "detail": "1R 50명의 핵심 지표 정의 1페이지. 베타 카드 20장을 직접 분류해 보며 포함/제외 예시 각 3개.",
-      "tag": "build"
+      "time": "09:00",
+      "end": "13:00",
+      "title": "Activity — 안 가본 곳, 안 해본 것",
+      "tag": "content",
+      "detail": "북한산둘레길 한 구간 — 걷다가 만난 한 사람에게 '왜 걷는지' 묻기"
     },
     {
-      "time": "10:15",
-      "end": "11:15",
-      "title": "Claude Code · 작은 단위 하나",
-      "detail": "Founder Direction 전달 1회분만. plan mode로 기존 코드·DB와 대조한 뒤 PR 한 개로 끝냅니다.",
-      "tag": "claude"
-    },
-    {
-      "time": "11:15",
-      "end": "12:00",
-      "title": "변리사 상담 질문 5개",
-      "detail": "유튜브·커뮤니티에 A-B-Bridge 구조를 공개하기 전에 확인할 것만. 결정 직전 멘토링 요청서 초안까지.",
-      "tag": "build"
-    },
-    {
-      "time": "12:00",
-      "end": "13:30",
-      "title": "점심과 죄책감 없는 쉼",
-      "detail": "'쉬러 와서도 뭔가 해야 하는' 느낌이 올라오면 그 순간을 조각으로 한 줄 남깁니다.",
-      "tag": "rest"
+      "time": "13:00",
+      "end": "14:00",
+      "title": "점심과 쉼",
+      "tag": "rest",
+      "detail": "쉬다가 '뭔가 해야 할 것 같은 느낌'이 올라오면 한 줄만 적기"
     },
     {
       "time": "14:00",
-      "end": "15:30",
-      "title": "기관 파이프라인 3곳",
-      "detail": "후보 기관마다 '담당자의 다음 행동' 하나를 적고, 그중 한 곳에 오늘 연락합니다.",
-      "tag": "build"
-    },
-    {
-      "time": "15:30",
-      "end": "16:30",
-      "title": "Creator OS Phase 0",
-      "detail": "촬영 헌법·5-shot·파일 규칙을 A4 한 장으로. 장비 세팅은 20분을 넘기지 않습니다.",
-      "tag": "content"
+      "end": "18:00",
+      "title": "온순간 빌드 (오늘만)",
+      "tag": "build",
+      "detail": "오늘만 한 블록 바꿈: 'Insight'를 무엇으로 셀지 1페이지 (1R 게이트가 가장 급해서)"
     },
     {
       "time": "18:00",
+      "end": "19:00",
+      "title": "저녁",
+      "tag": "rest",
+      "detail": "가족과 식탁. 조언 대신 질문 하나."
+    },
+    {
+      "time": "19:00",
       "end": "20:00",
-      "title": "가족 저녁과 산책",
-      "detail": "촬영보다 먼저 삽니다. 걸린 장면이 있으면 10~30분 뒤 60초 Voice Memo.",
-      "tag": "life"
+      "title": "글쓰기",
+      "tag": "content",
+      "detail": "오전에 만난 사람의 한마디를 한 문단으로"
+    },
+    {
+      "time": "20:00",
+      "end": "21:00",
+      "title": "운동",
+      "tag": "life",
+      "detail": "짐 · 러닝 · 수영 중 하나."
+    },
+    {
+      "time": "21:00",
+      "end": "22:00",
+      "title": "온순간 블로그",
+      "tag": "content",
+      "detail": "오늘의 3줄과 Return을 블로그 한 편으로."
     },
     {
       "time": "22:00",
       "end": "22:15",
-      "title": "밤 3분 Return, 그리고 끄기",
-      "detail": "아래 Return 칸을 채우고 저장합니다. 22시 이후엔 새 Claude 세션을 열지 않습니다.",
-      "tag": "life"
+      "title": "밤 3분 Return, 그리고 Dream",
+      "tag": "life",
+      "detail": "아래 Return을 저장하고 컴퓨터를 끕니다."
     }
   ],
   "build_focus": {
@@ -224,36 +217,6 @@
   "meta": {
     "source": "manual"
   },
-  "rotation": {
-    "one_line": [
-      "장면이 먼저, 의미는 나중.",
-      "오늘 한 번이면 충분하다.",
-      "고치기 전에, 먼저 만난다.",
-      "살아낸 것만 건넨다.",
-      "실패도 다음 Evidence다.",
-      "매일은 삶을 수집하고, 매주는 이야기를 완성한다.",
-      "내가 통제할 수 있는 한 가지."
-    ],
-    "choice": [
-      "오늘 누군가 말을 시작하면, 첫 60초는 답하지 않고 듣는다.",
-      "오늘 쉬는 30분 동안 '해야 할 것 같은 느낌'을 막지 않고 한 줄로만 적는다.",
-      "오늘 가장 미뤄 둔 연락 하나를 오전 안에 보낸다.",
-      "오늘 Claude 세션은 한 가지 일만 하고 /clear 한다.",
-      "오늘 저녁 식탁에서 조언 대신 질문 하나만 한다.",
-      "오늘 걸린 장면 하나를 10분 뒤 60초 음성으로 남긴다.",
-      "오늘 22시에 컴퓨터를 끈다."
-    ],
-    "return_question": [
-      "어제 고른 선택을 실제로 해 봤나요? 했든 못 했든 있는 그대로.",
-      "어제 가장 기억나는 장면은 무엇이었나요?",
-      "어제의 나에게 오늘 한 문장을 건넨다면?",
-      "이번 주에 반복해서 떠오른 장면이 있었나요?"
-    ],
-    "greeting": [
-      "범님, 좋은 아침입니다. 오늘은 오프라인 조언입니다. Claude에 연결되면 최근 대화를 읽고 다시 맞춰 드릴게요.",
-      "좋은 아침입니다, 범님. 오늘 창은 내장 조언으로 열었습니다. 3줄을 범님의 말로 고치는 것부터 시작해 보세요."
-    ]
-  },
   "top3": [
     {
       "tag": "life",
@@ -270,5 +233,108 @@
       "text": "걸린 장면 하나를 60초 음성으로 남기기",
       "why": "매일 찍지 않는다. 한 장면만 목격한다"
     }
-  ]
+  ],
+  "radar": {
+    "grants": [
+      {
+        "title": "2026년 경기 미래콘텐츠 제작지원",
+        "org": "경기도 · 경기콘텐츠진흥원",
+        "deadline": null,
+        "status": "확인 필요",
+        "fit": "AI 기반 콘텐츠·서비스를 만드는 경기도 예비창업자도 신청 가능. 창업·재도전 기업 4천만원",
+        "action": "접수 마감일과 예비창업자 요건을 공고에서 확인",
+        "url": "https://www.gcon.or.kr/gcon/business/gconNotice/view.do?pbancSrnm=11107&menuNo=200061"
+      },
+      {
+        "title": "K-Startup 진행 중 사업공고",
+        "org": "창업진흥원",
+        "deadline": null,
+        "status": "상시",
+        "fit": "검색 시점에 접수 중인 소셜벤처 공모는 찾지 못함 (제10회 소셜벤처 혁신경연대회는 8/21 마감)",
+        "action": "'예비창업' · '소셜' 필터로 새 공고 확인",
+        "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do"
+      },
+      {
+        "title": "기업마당 지원사업 검색",
+        "org": "중소벤처기업부",
+        "deadline": null,
+        "status": "상시",
+        "fit": "경기 예비·초기 창업 공고가 모이는 곳",
+        "action": "지역 '경기' + 분야 '창업'으로 검색",
+        "url": "https://www.bizinfo.go.kr"
+      }
+    ],
+    "ai_edu": [
+      {
+        "title": "[무료 세미나] 바이브코딩 x AI agent 2일 완성 워크샵",
+        "org": "패스트캠퍼스",
+        "date": "확인 필요",
+        "format": "온라인",
+        "cost": "무료",
+        "fit": "Claude Code로 온순간을 직접 만드는 범님의 방식과 가장 가까운 주제",
+        "url": "https://fastcampus.co.kr/event_online_vibeagent"
+      },
+      {
+        "title": "지식(GSEEK) 경기도 평생학습",
+        "org": "경기도",
+        "date": "상시",
+        "format": "온라인",
+        "cost": "무료",
+        "fit": "경기도민 무료 AI·디지털 강좌",
+        "url": "https://www.gseek.kr"
+      },
+      {
+        "title": "K-MOOC 인공지능 강좌",
+        "org": "국가평생교육진흥원",
+        "date": "상시",
+        "format": "온라인",
+        "cost": "무료",
+        "fit": "온순간 강사 준비용으로 AI 개념을 정리하기 좋음",
+        "url": "https://www.kmooc.kr"
+      }
+    ],
+    "events": [
+      {
+        "title": "안동국제탈춤페스티벌",
+        "place": "안동 원도심 · 하회마을",
+        "date_start": "2026-09-24",
+        "date_end": "2026-10-04",
+        "fit": "주제 '가면의 기억, 모두의 춤' — 나는 어떤 가면을 쓰고 살아왔나?",
+        "shot": "탈을 쓰기 전과 벗은 뒤의 손",
+        "url": "https://korean.visitkorea.or.kr/kfes/detail/fstvlDetail.do?fstvlCntntsId=644495a7-65e3-42ef-8993-e18e2e71a8bd"
+      },
+      {
+        "title": "2026 수원화성 미디어아트",
+        "place": "수원 화서문 · 장안문 일원",
+        "date_start": "2026-09-19",
+        "date_end": "2026-10-06",
+        "fit": "집에서 가까운 저녁 산책. 아내와 함께 걷는 Return 장면",
+        "shot": "성곽 위 빛과 두 사람의 뒷모습",
+        "url": "https://www.djournal.co.kr/news/article.html?no=114887"
+      },
+      {
+        "title": "금산세계인삼축제",
+        "place": "금산세계인삼엑스포광장",
+        "date_start": "2026-10-02",
+        "date_end": "2026-10-11",
+        "fit": "몇 년을 기다려야 캐는 인삼 — 오래 기다린 사람의 이야기",
+        "shot": "인삼을 캐는 손과 흙",
+        "url": "https://korean.visitkorea.or.kr/kfes/detail/fstvlDetail.do?fstvlCntntsId=933425f6-3f59-4de2-9d0d-39cbfb478d8e"
+      },
+      {
+        "title": "북한산둘레길",
+        "place": "서울 · 경기 북부",
+        "date_start": null,
+        "date_end": null,
+        "fit": "범님의 9~11월 걷기 목록. 수요일 Activity로 한 구간",
+        "shot": "매일 오는 사람의 등산화",
+        "url": "https://search.naver.com/search.naver?query=%EB%B6%81%ED%95%9C%EC%82%B0%EB%91%98%EB%A0%88%EA%B8%B8"
+      }
+    ],
+    "meta": {
+      "source": "web",
+      "searched_at": "2026-09-23T07:55",
+      "note": "샘플: Claude가 이 대화에서 직접 검색해 확인한 결과입니다. 마감일을 확인하지 못한 항목은 '확인 필요'로 표시했습니다."
+    }
+  }
 }
