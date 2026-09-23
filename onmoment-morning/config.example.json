@@ -7,6 +7,7 @@
   "engine": "auto",
   "engine_help": "auto = claude CLI(구독) → Anthropic API → 오프라인 순서로 시도. 'claude-cli' | 'api' | 'offline' 로 고정 가능.",
   "claude_cli_model": "",
+  "claude_timeout_sec": 360,
   "api_model": "claude-opus-5",
 
   "window_mode": "app",

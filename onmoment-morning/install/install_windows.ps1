@@ -101,14 +101,17 @@ if (-not $claude) {
     foreach ($c in "$env:USERPROFILE\.local\bin\claude.exe", "$env:APPDATA\npm\claude.cmd") { if (Test-Path $c) { $claude = $c } }
 }
 if ($claude) {
-    Ok "claude CLI 발견 — 범님의 대화를 읽고 조언을 생성합니다"
+    Ok "claude CLI 발견. 응답을 시험합니다 (최대 90초)..."
+    Push-Location $Root
+    & $py $Script --diagnose
+    Pop-Location
 } else {
     Warn "claude CLI를 찾지 못했습니다. 지금은 오프라인 내장 조언으로 열립니다."
     Warn "Claude Code 설치: PowerShell에서  irm https://claude.ai/install.ps1 | iex  실행 후, claude 를 한 번 실행해 로그인하세요."
 }
 
 # ------------------------------------------------------------------ 4. 첫 실행
-Step 4 "오늘의 창을 한 번 열어 봅니다 (Claude가 조언을 쓰는 데 1~3분)"
+Step 4 "오늘의 창을 엽니다 (내장 조언이 먼저 뜨고, Claude의 조언이 1~3분 뒤 자동으로 바뀝니다)"
 Push-Location $Root
 & $py $Script
 $runCode = $LASTEXITCODE

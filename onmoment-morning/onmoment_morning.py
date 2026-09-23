@@ -384,19 +384,42 @@ def find_claude() -> str | None:
     return next((str(c) for c in candidates if c.exists()), None)
 
 
-def run_claude_cli(prompt: str, model: str) -> str:
+def run_claude_cli(prompt: str, model: str, timeout: int) -> str:
     exe = find_claude()
     if not exe:
         raise RuntimeError("claude CLI를 찾지 못했습니다")
     cmd = [exe, "-p", "--output-format", "text"]
     if model:
         cmd += ["--model", model]
-    flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)  # Windows에서 콘솔 창이 번쩍이지 않게
-    proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8",
-                          timeout=1200, cwd=str(HERE), creationflags=flags)
-    if proc.returncode != 0 or not proc.stdout.strip():
-        raise RuntimeError(f"claude CLI 실패: {proc.stderr.strip()[:300]}")
-    return proc.stdout
+    windows = sys.platform.startswith("win")
+    proc = subprocess.Popen(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, encoding="utf-8", errors="replace", cwd=str(HERE),
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0) if windows else 0,  # 콘솔 창이 번쩍이지 않게
+        start_new_session=not windows,
+    )
+    try:
+        out, err = proc.communicate(prompt, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        # claude.cmd → node 처럼 자식 프로세스까지 통째로 끝내야 파이프가 풀린다
+        if windows:
+            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True,
+                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        else:
+            import signal
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except OSError:
+                proc.kill()
+        try:
+            proc.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        raise
+    if proc.returncode != 0 or not out.strip():
+        detail = (err.strip() or out.strip())[:300]
+        raise RuntimeError(f"claude CLI 실패 (코드 {proc.returncode}): {detail}")
+    return out
 
 
 def run_api(prompt: str, model: str) -> str:
@@ -421,6 +444,13 @@ def run_api(prompt: str, model: str) -> str:
     if message.stop_reason == "refusal":
         raise RuntimeError("API가 요청을 거절했습니다")
     return "".join(b.text for b in message.content if b.type == "text")
+
+
+def api_available() -> bool:
+    import importlib.util
+
+    return bool(importlib.util.find_spec("anthropic")) and bool(
+        os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))
 
 
 def parse_brief(raw: str) -> dict:
@@ -456,19 +486,6 @@ def chapter_chars(brief: dict) -> int:
 
 # ---------------------------------------------------------------- render & open
 
-LOADING_HTML = """<!doctype html><html lang="ko"><head><meta charset="utf-8">
-<meta http-equiv="refresh" content="6"><title>온순간 아침</title>
-<style>body{{margin:0;height:100vh;display:grid;place-items:center;color:#1c2330;
-background:linear-gradient(180deg,rgba(130,140,210,.22),rgba(240,160,95,.30)),#eef0ec;
-font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}}
-@media (prefers-color-scheme:dark){{body{{color:#e8eaee;background:linear-gradient(180deg,rgba(70,80,160,.30),rgba(150,110,170,.18)),#0f131a}}}}
-.sun{{width:72px;height:72px;border-radius:50%;margin:0 auto 28px;background:#e0892f;
-animation:rise 3s ease-in-out infinite alternate}}@keyframes rise{{from{{transform:translateY(10px);opacity:.6}}to{{transform:none;opacity:1}}}}
-p{{text-align:center;line-height:1.9;font-size:18px}}small{{opacity:.6;font-size:13px}}</style></head>
-<body><div><div class="sun"></div><p>{name}님, 좋은 아침입니다.<br>어제까지의 대화를 읽으며 오늘의 창을 여는 중입니다.<br>
-<small>숨 한 번 고르고 기다려 주세요 · 1~3분</small></p></div></body></html>"""
-
-
 def render(brief: dict, out_path: Path) -> None:
     html = TEMPLATE.read_text(encoding="utf-8")
     payload = json.dumps(brief, ensure_ascii=False).replace("</", "<\\/")
@@ -503,8 +520,8 @@ def open_window(path: Path, mode: str) -> None:
 
 # ---------------------------------------------------------------- main
 
-def acquire_lock(lock: Path) -> bool:
-    if lock.exists() and time.time() - lock.stat().st_mtime < 1800:
+def acquire_lock(lock: Path, stale_after: int) -> bool:
+    if lock.exists() and time.time() - lock.stat().st_mtime < stale_after:
         return False
     lock.write_text(str(os.getpid()), encoding="utf-8")
     return True
@@ -526,8 +543,25 @@ def diagnose(cfg: dict) -> int:
         ("앱 창 브라우저", find_app_browser() or "찾지 못함 → 기본 브라우저 탭으로 엽니다"),
         ("데이터 폴더", str(expand(cfg.get("data_dir", "~/OnMoment/morning")))),
     ]
+    data_dir = expand(cfg.get("data_dir", "~/OnMoment/morning"))
+    lock = data_dir / ".lock"
+    if lock.exists():
+        age = int(time.time() - lock.stat().st_mtime)
+        rows.append(("생성 작업", f"진행 중 표시 있음 ({age}초 전 시작). 멈춘 것 같으면 다시만들기.bat"))
+    today_html = data_dir / "briefs" / f"{dt.date.today().isoformat()}.html"
+    rows.append(("오늘 조언", "완성됨" if today_html.exists() else "아직 없음"))
     for k, v in rows:
         print(f"{k:<18} {v}")
+    if find_claude():
+        print("claude 응답 시험      (최대 90초)...", flush=True)
+        try:
+            t = time.time()
+            reply = run_claude_cli("다른 말 없이 OK 라고만 답하세요.", cfg.get("claude_cli_model", ""), 90)
+            print(f"claude 응답          정상 ({time.time() - t:.0f}초): {reply.strip()[:60]}")
+        except subprocess.TimeoutExpired:
+            print("claude 응답          90초 안에 답이 없음 → 터미널에서 claude 를 한 번 실행해 로그인/첫 설정을 마쳐 주세요")
+        except Exception as e:
+            print(f"claude 응답          실패: {e}")
     return 0
 
 
@@ -588,16 +622,25 @@ def main() -> int:
         log(data_dir, "오늘 조언이 이미 있어 창만 열었습니다")
         return 0
 
+    timeout = int(cfg.get("claude_timeout_sec", 360))
     lock = data_dir / ".lock"
-    if not acquire_lock(lock):
+    if not acquire_lock(lock, timeout + 120):
         log(data_dir, "다른 생성 작업이 진행 중입니다")
         if not args.no_open and window.exists():
             open_window(window, mode)
         return 0
 
+    def show_offline(pending: bool, note: str = "") -> dict:
+        """창이 절대 빈 대기 화면에 갇히지 않도록, 내장 조언을 먼저 그려 둔다."""
+        brief = offline_brief(today)
+        brief["meta"] = {"pending": pending, "note": note, "timeout": timeout}
+        finish(brief, "offline", window)
+        return brief
+
+    brief, source, notes = None, "offline", []
     try:
-        if not args.no_open:
-            window.write_text(LOADING_HTML.format(name=cfg.get("name", "범")), encoding="utf-8")
+        if not args.no_open and not args.offline:
+            show_offline(pending=True)
             open_window(window, mode)
 
         memory_path = data_dir / "memory.md"
@@ -619,21 +662,32 @@ def main() -> int:
         )
 
         engine = "offline" if args.offline else cfg.get("engine", "auto")
-        order = ["claude-cli", "api", "offline"] if engine == "auto" else [engine, "offline"]
-        brief, source = None, "offline"
+        order = ["claude-cli", "api"] if engine == "auto" else [] if engine == "offline" else [engine]
+        if engine == "auto" and not api_available():
+            order.remove("api")  # API 키나 SDK가 없으면 조용히 건너뛴다
         for name in order:
             try:
                 if name == "claude-cli":
-                    brief = parse_brief(run_claude_cli(prompt, cfg.get("claude_cli_model", "")))
+                    brief = parse_brief(run_claude_cli(prompt, cfg.get("claude_cli_model", ""), timeout))
                 elif name == "api":
                     brief = parse_brief(run_api(prompt, cfg.get("api_model", "claude-opus-5")))
-                else:
-                    brief = offline_brief(today)
                 source = name
                 break
+            except subprocess.TimeoutExpired:
+                notes.append(f"{name}: {timeout}초 안에 끝나지 않음")
+                log(data_dir, f"{name} 엔진 시간 초과 ({timeout}초)")
             except Exception as e:  # 다음 엔진으로 넘어간다
+                notes.append(f"{name}: {e}")
                 log(data_dir, f"{name} 엔진 실패: {e}")
 
+        if brief is None:
+            brief = offline_brief(today)
+            brief["meta"] = {"note": " / ".join(notes)[:400] if notes else ""}
+        if source == "offline" and not args.offline:
+            # Claude 연결이 안 된 날은 '완성본'으로 저장하지 않아, 다음 실행(로그인 등)에서 다시 시도한다
+            finish(brief, source, window)
+            log(data_dir, "Claude 조언을 받지 못해 내장 조언을 보여주었습니다 (다음 실행 때 다시 시도)")
+            return 0
         finish(brief, source, today_html)
         today_json.write_text(json.dumps(brief, ensure_ascii=False, indent=2), encoding="utf-8")
         shutil.copy(today_html, window)
@@ -646,6 +700,14 @@ def main() -> int:
         if args.no_open:
             print(today_html)
         return 0
+    except BaseException as e:
+        # 어떤 이유로든 중단되면 '쓰는 중' 표시를 거두고, 무엇이 문제인지 창에 남긴다
+        if brief is None or source == "offline":
+            try:
+                show_offline(pending=False, note=f"생성 중 오류: {type(e).__name__}: {e}"[:400])
+            except Exception:
+                pass
+        raise
     finally:
         lock.unlink(missing_ok=True)
 
