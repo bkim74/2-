@@ -3,21 +3,21 @@
 > 매일 콘텐츠를 만들지 않는다. 매일 온순간을 살고 증거만 남긴다.
 
 매일 **아침 6시**, 그리고 **컴퓨터에 로그인할 때마다** 창이 하나 열립니다.
-이 창은 범님이 Claude와 나눈 대화, 온순간 문서, 어젯밤의 Return 기록을 읽고
-오늘 하루를 위한 **5,000자 이상의 조언 대시보드**를 보여줍니다.
+이 창은 범님이 Claude와 나눈 대화, **구글 캘린더**, **구글 Keep 메모**, 온순간 문서, 어젯밤의 Return 기록을 읽고
+오늘 하루를 **시간 블록마다 코칭**하는 대시보드를 보여줍니다. 모든 글은 **개조식**입니다.
 
 화면은 위에서 아래로 여섯 칸입니다.
 
 | 칸 | 내용 |
 |---|---|
 | 1. 오늘의 한 문장 | 지금 시각의 해 위치와 오늘 일정 눈금 |
-| 2. 오늘 | 3줄(현재·바람·선택, 직접 고쳐 쓰기) · 어제로부터의 질문 · **오늘 꼭 할 3가지** |
-| 3. 흐름 · 게이트 | 범님이 엑셀에 설계한 **요일별 리듬** 위에 오늘 할 일 · 모두의창업/Creator OS D-day |
+| 2. 오늘 브리핑 | 캘린더·게이트를 엮은 오늘의 전제 3~5줄 · 여러 날 일정(D-n) · 3줄 · **오늘 꼭 할 3가지** · Keep에서 꺼낸 것 |
+| 3. 흐름 · 코칭 | **요일별 리듬 + 캘린더 약속**을 합친 하루. 블록마다 준비 · 현장 · 후 코칭 / 앞으로 7일 · 게이트 D-day |
 | 4. 레이더 | 매일 아침 **웹 검색**: 정부지원사업(마감 D-day) · AI 교육 · 2주 안의 국내 일정 |
 | 5. 조언 | 탭 5개 — 온순간을 산다 / 비즈니스 / 콘텐츠(촬영 미션) / Claude Code(복사용 프롬프트) / 리듬 |
 | 6. 밤 3분 Return | 저장하면 다음 날 아침 조언이 읽어 갑니다 |
 
-미리보기: [`preview/sample.html`](preview/sample.html)을 브라우저로 여세요 (2026-09-23 샘플, 레이더는 실제 검색 결과).
+미리보기: [`preview/sample.html`](preview/sample.html)을 브라우저로 여세요 (2026-09-24 샘플 — 범님의 실제 구글 캘린더 기준, 사람 이름은 뺐습니다. Keep 항목은 예시입니다).
 
 ---
 
@@ -77,12 +77,50 @@ python onmoment_morning.py --diagnose # 설치 상태 점검
 |---|---|---|
 | Claude Code 대화 | `~/.claude/projects/**/*.jsonl` | 자동. 범님이 쓴 메시지와 도구 사용 통계 (최근 7일 본문, 30일 통계) |
 | claude.ai 웹/앱 대화 | `config.json` → `history.claude_ai_export` | claude.ai → Settings → Privacy → **Export data**로 받은 zip의 `conversations.json` 경로를 적으면 함께 읽습니다 |
+| 구글 캘린더 | `config.json` → `calendar.ics_urls` | 오늘 일정 · 여러 날 일정 · 앞으로 7일 |
+| 구글 Keep · 메모 | `config.json` → `keep` | Takeout 내보내기, .md/.txt 메모 |
 | 온순간 문서 | `context/` 폴더 | `.md`, `.txt`, `.docx`를 넣으면 반영됩니다 (파일당 12,000자). 기본으로 프로필 · North Star · 모두의창업 · Creator OS · 2nd Life 요약이 들어 있습니다 |
 | 어젯밤 Return | `~/Downloads`, `~/OnMoment/morning/returns` | 대시보드에서 저장한 `onmoment-return-날짜.md` |
 | 누적 기억 | `~/OnMoment/morning/memory.md` | 매일 조언이 "내일 기억할 사실"을 덧붙입니다. 직접 고치거나 지워도 됩니다 |
 
 모든 기록은 범님의 컴퓨터에만 저장됩니다. 조언을 만들 때 Claude Code(또는 설정한 경우 Anthropic API)로 위 내용이 전송됩니다.
 이 도구 폴더에서 `claude -p`로 실행된 기록은 다음 날 다시 읽지 않도록 제외합니다.
+
+## 구글 캘린더 연결 (2분)
+
+1. [구글 캘린더](https://calendar.google.com) → 오른쪽 위 ⚙ **설정**
+2. 왼쪽 '내 캘린더의 설정'에서 캘린더(예: 기본 캘린더, 가족) 클릭
+3. 아래로 내려 **캘린더 통합** → **비공개 주소(iCal 형식)** 복사 (`https://calendar.google.com/calendar/ical/.../private-.../basic.ics`)
+4. 도구 폴더의 `config.json`을 메모장으로 열어 붙여 넣기
+
+```json
+"calendar": {
+  "ics_urls": [
+    { "name": "개인", "url": "https://calendar.google.com/calendar/ical/...개인.../basic.ics" },
+    { "name": "가족", "url": "https://calendar.google.com/calendar/ical/...가족.../basic.ics" }
+  ]
+}
+```
+
+5. `점검하기.bat`으로 확인 → `구글 캘린더  2개 연결 · 오늘 n건` 이 보이면 끝
+
+- 비공개 주소는 **비밀번호처럼** 다루세요. (`config.json`은 git에 올라가지 않습니다) 유출되면 같은 화면에서 '재설정'.
+- 반복 일정 · 예외 날짜 · 한 번만 바뀐 반복 일정까지 반영합니다.
+- 마지막으로 받은 일정을 보관해, 인터넷이 안 되는 아침에도 어제 받은 일정으로 코칭합니다.
+- 새벽 수영처럼 매일 반복되는 일정은 '앞으로 7일'에서 빼고, 큰 일정만 보여줍니다.
+- 20시간이 넘는 일정(이사 준비, 데이터 연결 기간 등)은 **오늘의 배경**으로 D-n과 함께 보입니다.
+
+## 구글 Keep · 메모 연결
+
+구글 Keep은 개인용 API가 없어, **Google Takeout 내보내기**를 읽습니다.
+
+1. [takeout.google.com](https://takeout.google.com) → '모두 선택 해제' → **Keep**만 체크 → 내보내기
+2. 메일로 온 `takeout-....zip`을 **다운로드 폴더에 그대로** 두기 (압축을 풀어도 됩니다)
+3. 끝. 가장 최근 내보내기를 자동으로 찾습니다. (`config.json` → `keep.dirs`)
+
+- 읽는 것: **고정한 메모**, 최근 45일 안에 고친 메모, **체크 안 된 항목** → 오늘 어느 블록에서 할지 코칭
+- 한 달에 한 번 내보내기를 다시 하면 새 메모가 반영됩니다. (Takeout의 '정기 내보내기'를 2개월마다로 설정 가능)
+- 옵시디언 등 `.md/.txt` 메모 폴더는 `keep.note_dirs`에 적으면 `- [ ]` 항목까지 읽습니다.
 
 ## 레이더 (웹 검색)
 
@@ -98,7 +136,8 @@ python onmoment_morning.py --diagnose # 설치 상태 점검
 ## 요일별 리듬
 
 `config.json`의 `weekly_rhythm`에 요일별 기본 일과가 들어 있습니다. 2nd Life 엑셀의 Bucket lists 시트에서 옮겼습니다.
-조언은 이 리듬을 바꾸지 않고, 각 블록에 오늘 할 일만 채웁니다. 리듬을 바꾸고 싶으면 여기를 고치세요.
+캘린더 약속이 먼저 들어가고, 겹친 리듬 블록은 줄이거나 옮기라고 표시합니다. 게이트 마감이 가까운 날에는 리듬 한 블록만 바꿀 수 있습니다.
+리듬 자체를 바꾸고 싶으면 여기를 고치세요.
 
 ## 꼭 고쳐 주세요: 일정
 
@@ -125,11 +164,12 @@ python onmoment_morning.py --diagnose # 설치 상태 점검
 ```
 onmoment-morning/
 ├── onmoment_morning.py      # 수집 → 프롬프트 → 생성 → 렌더 → 창 띄우기 (표준 라이브러리만 사용)
+├── life_sources.py          # 구글 캘린더(iCal) · Keep(Takeout) · 메모 읽기, 리듬과 캘린더 합치기
 ├── template.html            # 대시보드 디자인 (라이트/다크, 모바일 대응, 체크 상태 자동 저장)
 ├── config.example.json      # 설정 (첫 실행 시 config.json으로 복사됨)
 ├── context/                 # 조언이 매일 읽는 온순간 문서
 ├── data/places_kr.csv       # 월별 국내 여행지 180곳 (2nd Life 엑셀 'on moment' 시트)
-├── fallback/brief.json      # 오프라인 조언 + 2026-09-23 샘플
+├── fallback/brief.json      # 오프라인 조언 (개조식) + 블록별 코칭 문구
 ├── install/                 # Windows / macOS / Linux 자동 실행 등록
 └── preview/                 # 샘플 데이터(sample_brief.json)와 렌더된 미리보기
 ```

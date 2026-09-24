@@ -3,9 +3,10 @@
 
 매일 아침 6시, 또는 컴퓨터에 로그인할 때 실행되어
 - Claude Code 대화 기록(~/.claude/projects)과 claude.ai 내보내기(선택)
+- 구글 캘린더(비공개 iCal 주소)와 구글 Keep(Takeout) · 메모 폴더
 - context/ 폴더의 온순간 문서들
 - 어제의 조언과 어젯밤 Return 기록
-을 읽고, 오늘 하루를 위한 5,000자 이상의 조언 대시보드를 만들어 창으로 띄운다.
+을 읽고, 오늘 하루를 시간 블록마다 코칭하는 개조식 대시보드를 만들어 창으로 띄운다.
 
 표준 라이브러리만으로 동작한다. (Anthropic API 엔진을 쓸 때만 `pip install anthropic`)
 
@@ -34,6 +35,10 @@ import webbrowser
 import zipfile
 from collections import Counter
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from life_sources import (calendar_text, collect_calendar, collect_notes, guess_tag,  # noqa: E402
+                          merge_plan, notes_text)
 
 HERE = Path(__file__).resolve().parent
 TEMPLATE = HERE / "template.html"
@@ -272,91 +277,116 @@ def milestones_with_dday(milestones: list[dict], today: dt.date) -> list[dict]:
 # ---------------------------------------------------------------- prompt
 
 SCHEMA = r"""{
-  "greeting": "범님을 부르는 아침 인사 1~2문장 (요일·날씨 추측 금지, 어제/최근 대화의 구체적 장면 하나를 언급)",
-  "one_line": "오늘의 한 문장 — 범님이 오늘 붙잡을 문장 (25자 안팎, 주장보다 고백의 톤)",
-  "return_question": "어제의 선택/최근 약속에 대한 Return 질문 1개 (판정 말고 있는 그대로 묻기)",
+  "greeting": "아침 인사 한 줄 (40자 이내, 최근 대화의 구체적 장면 하나)",
+  "one_line": "오늘의 한 문장 (25자 안팎, 고백의 톤)",
+  "return_question": "어제의 선택/약속에 대한 질문 1개 (한 줄)",
+  "briefing": ["오늘의 브리핑 3~5줄 — 캘린더·배경 일정·게이트를 엮은 오늘의 전제와 우선순위. 각 줄 40자 이내, '→'로 판단을 보여줌. 예: '이사준비 D-6 → 저녁 30분 박스 2개만'"],
   "three_lines": {
-    "reality": "현재(A) — 대화에서 관찰된 지금의 사실 한 줄",
-    "wish": "바람(B) — 범님이 스스로 말한 바라는 장면 한 줄 (범님의 말을 최대한 그대로)",
-    "choice": "선택(Bridge) — 오늘 통제 가능한 작은 한 행동 한 줄"
+    "reality": "현재 — 관찰된 사실 한 줄",
+    "wish": "바람 — 범님의 말 그대로 한 줄",
+    "choice": "선택 — 오늘의 작은 한 행동 한 줄"
   },
   "top3": [
-    {"tag": "life|build|content", "text": "오늘 꼭 할 일 한 줄 (동사로 끝나게, 30자 안팎)", "why": "왜 오늘인지 한 줄"}
+    {"tag": "life|build|content", "text": "오늘 꼭 할 일 (동사로 끝, 30자 안팎)", "why": "왜 오늘 · 어느 블록 (20자 안팎)"}
   ],
   "day_plan": [
-    {"time": "06:00", "end": "07:00", "title": "블록 제목", "detail": "이 블록에서 오늘 할 구체적인 한 가지", "tag": "life|build|content|claude|rest"}
+    {"time": "06:00", "end": "07:00", "title": "블록 제목", "tag": "life|build|content|claude|rest", "source": "rhythm|calendar",
+     "detail": "이 블록의 오늘 할 일 한 줄 (명사형)",
+     "coach": ["준비 · ...", "현장 · ...", "후 · ..."]}
   ],
-  "build_focus": {"gate": "지금 통과하려는 게이트", "today_task": "오늘 이 게이트를 위해 할 단 하나", "metric": "오늘 끝났다고 말할 수 있는 기준"},
+  "keep_picks": [
+    {"note": "Keep/메모 제목", "item": "오늘 꺼낼 항목 한 줄", "when": "어느 블록에서 (예: 14:00 온순간 빌드)"}
+  ],
+  "build_focus": {"gate": "지금 게이트", "today_task": "오늘 단 하나", "metric": "끝났다고 말할 기준"},
   "content_mission": {
-    "question": "오늘 삶에서 품고 다닐 질문 하나 (콘텐츠 기획이 아니라 삶의 방향)",
+    "question": "오늘 품고 다닐 질문 하나",
     "shots": [{"key": "WHERE", "hint": "..."}, {"key": "MOVE", "hint": "..."}, {"key": "DETAIL", "hint": "..."}, {"key": "HUMAN", "hint": "..."}, {"key": "EVIDENCE", "hint": "..."}],
     "voice_memo": ["방금 무슨 일이 있었나?", "예상과 무엇이 달랐나?", "내게 뭐가 걸렸나?"],
-    "episode_seed": "이번 주 에피소드 후보 한 줄 (시리즈명 포함)"
+    "episode_seed": "이번 주 에피소드 후보 한 줄"
   },
   "chapters": [
     {
       "id": "life | build | content | claude | rhythm",
       "kicker": "짧은 머리말 (예: 01 · 온순간을 산다)",
-      "title": "장 제목",
-      "evidence": "이 조언의 근거가 된 범님의 실제 대화/기록 — 날짜와 함께 짧게 인용",
-      "body_md": "본문 (마크다운: 문단, **굵게**, - 목록, > 인용, ### 소제목). 장당 1,000~1,400자",
-      "actions": ["오늘 할 수 있는 구체 행동 3개"]
+      "title": "장 제목 (20자 안팎)",
+      "evidence": "근거 — 날짜 + 범님의 말 짧은 인용 (한 줄)",
+      "body_md": "개조식 본문. '### 소제목' 3~4개, 각 소제목 아래 '- ' 항목 3~5개. 항목은 한 줄(45자 이내), 명사형·'~하기' 종결. 필요하면 '  - ' 하위 항목. 문단 금지. 장당 900~1,300자",
+      "actions": ["오늘 할 구체 행동 3개 (각 한 줄)"]
     }
   ],
   "claude_code": [
-    {"title": "팁 제목", "why": "범님의 실제 사용 패턴에서 이 팁이 필요한 이유", "how": "적용 방법 2~4문장", "prompt": "그대로 복사해 Claude Code에 붙여넣을 프롬프트 또는 명령"}
+    {"title": "팁 제목", "why": "범님의 사용 패턴에서 필요한 이유 (한 줄)", "how": ["적용 단계 2~4개, 각 한 줄"], "prompt": "그대로 복사해 붙여넣을 프롬프트 또는 명령"}
   ],
-  "watchouts": ["오늘 조심할 패턴 2~3개 (판결 말고 관찰)"],
+  "watchouts": ["오늘 조심할 패턴 2~3개 (관찰, 한 줄)"],
   "evening": ["밤 3분 질문 3개"],
-  "memory_update": ["내일의 나(조언 AI)를 위해 기억할 새 사실 2~5개 — 대화에서 확인된 것만"]
+  "memory_update": ["내일의 조언 AI가 기억할 새 사실 2~5개 — 확인된 것만"]
 }"""
 
-PROMPT = """당신은 김범(범님)의 아침 동반자다. 범님은 온순간(OnMoment)의 창업자이자 첫 번째 Storydoer다.
+PROMPT = """당신은 김범(범님)의 아침 동반자이자 하루 코치다. 범님은 온순간(OnMoment)의 창업자이자 첫 번째 Storydoer다.
 매일 아침 6시(또는 컴퓨터를 켤 때) 이 조언이 창으로 뜬다. 범님이 "진정 매순간 온순간을 살고 싶다"고 해서 만든 창이다.
 
 오늘: {today} ({weekday}요일)
 
-# 당신이 지켜야 할 온순간의 규칙 (범님이 직접 정한 것)
+# 온순간의 규칙 (범님이 직접 정한 것)
 - AI is not the author of meaning. AI is the architect of attention. 의미와 선택은 범님이 한다.
-- Concrete before abstract. Observation before interpretation. 판결·진단·"당신은 이런 사람" 금지.
-- 가능성은 가설로, 최대 2개. 한 번에 하나의 tension만 전면에.
+- Concrete before abstract. Observation before interpretation. 판결·진단 금지.
+- 가능성은 가설로, 최대 2개. 한 번에 하나의 tension만.
 - Small controllable action. Reality before positivity. 억지 교훈·억지 긍정 금지.
-- User words before AI words: 범님이 대화에서 쓴 표현을 최대한 그대로 되비춘다.
-- 매일 콘텐츠를 만들지 않는다. 매일 온순간을 살고 증거만 남긴다. 생산량 압박 금지.
-- 1인 창업자의 소진을 경계한다. 쉼·가족·신앙도 계획의 정식 블록이다.
+- User words before AI words: 범님의 표현을 그대로 되비춘다.
+- 매일 콘텐츠를 만들지 않는다. 매일 온순간을 살고 증거만 남긴다.
+- 1인 창업자의 소진 경계. 쉼·가족·신앙도 정식 블록이다.
 
-# 입력 1 — 범님에 대한 문서 (프로필, North Star, 모두의창업, Creator OS)
+# 문체 — 개조식 (가장 중요)
+- 모든 글은 개조식. 문단·설명문 금지. 한 항목 = 한 줄 = 한 가지.
+- 종결은 명사형 또는 '~하기' (예: "10분 스트레칭", "3줄만 고쳐 쓰기"). '~합니다/~해요' 금지.
+- 숫자·시각·장소·사람(관계로만 표기)을 넣어 구체적으로. 형용사·수식어 최소.
+- 판단은 '→'로 짧게 (예: "수영 06:00 → 기도는 수영 후 10분").
+
+# 입력 1 — 범님에 대한 문서 (프로필, North Star, 모두의창업, Creator OS, 2nd Life)
 {context}
 
 # 입력 2 — 일정 게이트 (config.json, D-day는 오늘 기준)
 {milestones}
 
-# 입력 3 — 조언 AI의 누적 기억 (지난 아침들이 남긴 것)
+# 입력 3 — 구글 캘린더 (범님의 실제 일정)
+{calendar}
+
+# 입력 4 — 오늘의 흐름 초안 = 요일별 리듬 + 캘린더 일정 (source=calendar 는 실제 약속)
+{plan}
+
+# 입력 5 — 구글 Keep · 메모 (최근/고정 메모와 체크 안 된 항목)
+{notes}
+
+# 입력 6 — 조언 AI의 누적 기억
 {memory}
 
-# 입력 4 — 어제의 조언에서 범님이 고른 선택 / 어젯밤 Return 기록
+# 입력 7 — 어제의 선택 / 어젯밤 Return 기록
 어제 조언의 선택: {yesterday_choice}
 {returns}
 
-# 입력 5 — 오늘({weekday}요일)의 기본 리듬 (범님이 직접 설계한 요일별 일과)
-{rhythm}
-
-# 입력 6 — Claude Code 사용 통계 (최근 {stats_days}일)
+# 입력 8 — Claude Code 사용 통계 (최근 {stats_days}일)
 {stats}
 
-# 입력 7 — 범님이 최근 Claude와 나눈 대화 (범님이 쓴 메시지만, 시간순)
+# 입력 9 — 범님이 최근 Claude와 나눈 대화 (범님이 쓴 메시지만, 시간순)
 {history}
 
-# 과제
-위 입력을 근거로, 오늘 하루를 위한 조언 대시보드 데이터를 만든다.
-- chapters는 정확히 5개, 이 순서: life(온순간을 산다 — 자기·관계·신앙), build(온순간 비즈니스 빌드업 — 모두의창업 게이트), content(온순간 콘텐츠 실행 — Creator OS), claude(Claude Code를 더 잘 쓰는 법), rhythm(오늘의 리듬 — 에너지·쉼·가족).
-- 5개 장의 body_md 합계는 반드시 한국어 5,500자 이상. 문장은 짧고 쉽게. 일반론 금지, 최근 대화에서 나온 구체적 장면·결정·고민을 짚을 것.
-- 각 장의 evidence에는 실제 대화 근거를 날짜와 함께 인용. 근거가 없으면 "최근 대화에는 이 주제가 없었습니다"라고 솔직히 쓰고 문서 기반으로 조언.
-- day_plan은 입력 5의 기본 리듬 블록을 그대로 쓰고(시간·제목 유지), 각 블록의 detail에 오늘 그 시간에 할 구체적인 한 가지를 채운다. 리듬을 바꿔야 할 이유가 있으면 한 블록만 바꾸고 detail에 이유를 쓴다.
-- top3는 정확히 3개: 오늘 꼭 할 일(life 1, build 1, content 1). 모두 day_plan의 어느 블록에서 할지 떠올릴 수 있게.
-- claude_code는 4개. 통계(도구 사용·세션 길이·프로젝트)와 대화 내용에서 보이는 실제 병목에 맞춘 팁. 슬래시 명령, CLAUDE.md, 서브에이전트, plan mode, hooks, skills, headless(claude -p), worktree 등에서 지금 범님에게 가장 효과 큰 것.
-- build_focus는 모두의창업 게이트 중 지금 가장 중요한 것 하나.
-- memory_update에는 오늘 대화에서 새로 확인된 사실만 (추측 금지).
+# 과제 — 오늘 하루를 실제로 사는 데 쓰는 코칭 대시보드
+- briefing: 입력 3의 오늘 일정·배경 일정(이사 준비 같은 여러 날 일정)·앞으로 7일의 큰 일정·게이트 D-day를 엮어
+  오늘의 전제와 우선순위 3~5줄. 에너지가 몰리는 날/비는 날, 준비가 필요한 다가오는 약속(예: 사흘 뒤 포럼)을 짚기.
+- day_plan: 입력 4를 기본으로. 캘린더 일정(source=calendar)은 시간·제목 그대로 유지하고 반드시 포함.
+  겹친 리듬 블록(overlap 표시)은 옮기거나 줄이고 detail에 '→ 06:50 이후로' 식으로 조정 표시.
+  모든 블록에 detail 한 줄 + coach 2~3개 ('준비 · ', '현장 · ', '후 · ' 로 시작, 각 25자 안팎):
+  준비물·이동 시간·질문 하나·찍을 장면·끝나고 남길 한 줄 등 그 블록을 온순간으로 사는 구체 코칭.
+  source=calendar 블록은 그 약속에 맞춘 코칭 (예: 포럼 → 명함 10장·물을 질문 1개·만날 사람 1명).
+- keep_picks: 입력 5에서 오늘 꺼낼 만한 것 최대 3개와 할 블록. 메모가 없으면 빈 배열.
+- top3: 정확히 3개(life 1, build 1, content 1). 각각 day_plan의 어느 블록에서 할지 why에 표시.
+- chapters: 정확히 5개, 이 순서: life(온순간을 산다 — 자기·관계·신앙), build(비즈니스 빌드업 — 모두의창업 게이트),
+  content(콘텐츠 실행 — Creator OS), claude(Claude Code를 더 잘 쓰는 법), rhythm(오늘의 리듬 — 에너지·쉼·가족·이번 주 일정).
+  5개 장의 body_md 합계 한국어 5,000자 이상. 일반론 금지, 최근 대화·캘린더·메모의 구체 장면을 짚기.
+  evidence에 근거 날짜+인용. 근거가 없으면 "최근 대화엔 이 주제 없음 → 문서 기준"이라고 쓰기.
+- claude_code: 4개. 통계와 대화에서 보이는 실제 병목에 맞춘 팁.
+- build_focus: 모두의창업 게이트 중 지금 가장 중요한 것 하나.
+- memory_update: 오늘 새로 확인된 사실만 (추측 금지).
 
 반드시 아래 스키마의 JSON 객체 하나만 출력한다. 코드블록·설명·머리말 없이 {{ 로 시작해 }} 로 끝낸다.
 {schema}
@@ -364,7 +394,8 @@ PROMPT = """당신은 김범(범님)의 아침 동반자다. 범님은 온순간
 
 
 def build_prompt(cfg: dict, today: dt.date, context: str, milestones: list[dict], memory: str,
-                 yesterday_choice: str, returns: str, stats: dict, history: str) -> str:
+                 yesterday_choice: str, returns: str, stats: dict, history: str,
+                 calendar: str = "", plan: list[dict] | None = None, notes: str = "") -> str:
     ms_lines = []
     for m in milestones:
         when = f"{m['date']} (D{'-' if m.get('dday', 0) >= 0 else '+'}{abs(m['dday'])})" if m.get("dday") is not None else "날짜 미정"
@@ -375,7 +406,10 @@ def build_prompt(cfg: dict, today: dt.date, context: str, milestones: list[dict]
         context=context or "(없음)", milestones="\n".join(ms_lines) or "(없음)",
         memory=memory or "(아직 없음 — 첫 아침)", yesterday_choice=yesterday_choice or "(없음)",
         returns=returns or "(어젯밤 Return 기록 없음)", stats_days=cfg["history"]["stats_days"],
-        stats=stats_text, history=history, schema=SCHEMA, rhythm=rhythm_text(today_rhythm(cfg, today)),
+        stats=stats_text, history=history, schema=SCHEMA,
+        calendar=calendar or "(캘린더 연결 안 됨 — config.json 의 calendar.ics_urls)",
+        plan=plan_text(plan if plan is not None else today_rhythm(cfg, today)),
+        notes=notes or "(연결된 메모 없음)",
     )
 
 
@@ -389,8 +423,16 @@ def today_rhythm(cfg: dict, today: dt.date) -> list[dict]:
     return [dict(b) for b in blocks]
 
 
-def rhythm_text(blocks: list[dict]) -> str:
-    return "\n".join(f"- {b['time']}~{b.get('end', '')} [{b.get('tag', '')}] {b['title']}" for b in blocks) or "(설정 없음)"
+def plan_text(blocks: list[dict]) -> str:
+    lines = []
+    for b in blocks:
+        line = f"- {b['time']}~{b.get('end') or ''} [{b.get('tag', '')}] {b['title']} (source={b.get('source', 'rhythm')})"
+        if b.get("source") == "calendar" and b.get("detail"):
+            line += f" @ {b['detail']}"
+        if b.get("overlap"):
+            line += f" ※ 겹침: {b['overlap']}"
+        lines.append(line)
+    return "\n".join(lines) or "(설정 없음)"
 
 
 # ---------------------------------------------------------------- radar (웹 검색)
@@ -599,15 +641,33 @@ def parse_brief(raw: str) -> dict:
     return brief
 
 
-def offline_brief(today: dt.date, cfg: dict | None = None) -> dict:
+def offline_brief(today: dt.date, cfg: dict | None = None, plan: list[dict] | None = None,
+                  notes: list[dict] | None = None) -> dict:
     """LLM 없이도 창이 비지 않도록, 내장 조언을 날짜별로 회전시킨다."""
     with open(FALLBACK, encoding="utf-8") as f:
         brief = json.load(f)
-    rhythm = today_rhythm(cfg, today) if cfg else []
-    if rhythm:  # 범님이 설계한 요일별 리듬을 그대로 쓴다
-        brief["day_plan"] = rhythm
-    rotation = brief.pop("rotation", {})
+    if plan is None:
+        plan = [dict(b, source="rhythm") for b in today_rhythm(cfg, today)] if cfg else []
+    coach = brief.pop("coach", {})
     i = today.toordinal()
+    if plan:  # 범님이 설계한 요일별 리듬 + 캘린더 일정
+        blocks = []
+        for n, b in enumerate(plan):
+            b = dict(b)
+            pool = coach.get("calendar" if b.get("source") == "calendar" else b.get("tag", "rest")) or coach.get("rest") or []
+            if pool:
+                b.setdefault("coach", pool[(i + n) % len(pool)])
+            if b.get("overlap"):
+                b["detail"] = f"→ 캘린더 일정({b['overlap']})에 맞춰 줄이거나 옮기기"
+            blocks.append(b)
+        brief["day_plan"] = blocks
+    picks = []
+    for note in notes or []:
+        for item in note.get("open_items", [])[:2]:
+            picks.append({"note": note["title"], "item": item, "when": "빈 블록 15분"})
+    if picks:
+        brief["keep_picks"] = picks[:3]
+    rotation = brief.pop("rotation", {})
     for key, pool in rotation.items():
         if pool:
             pick = pool[i % len(pool)]
@@ -616,6 +676,17 @@ def offline_brief(today: dt.date, cfg: dict | None = None) -> dict:
             else:
                 brief[key] = pick
     return brief
+
+
+def ensure_calendar_blocks(plan: list[dict], todays: list[dict]) -> list[dict]:
+    """모델이 캘린더 약속을 빠뜨려도, 실제 약속은 흐름에서 사라지지 않게."""
+    have = {(b.get("time"), (b.get("title") or "")[:6]) for b in plan}
+    for e in todays:
+        if not any(b.get("time") == e["start"] and b.get("source") == "calendar" for b in plan) and \
+                (e["start"], e["title"][:6]) not in have:
+            plan.append({"time": e["start"], "end": e["end"], "title": e["title"], "tag": guess_tag(e["title"]),
+                         "detail": e["location"], "source": "calendar"})
+    return sorted(plan, key=lambda b: (b.get("time") or "99"))
 
 
 def chapter_chars(brief: dict) -> int:
@@ -681,6 +752,21 @@ def diagnose(cfg: dict) -> int:
         ("앱 창 브라우저", find_app_browser() or "찾지 못함 → 기본 브라우저 탭으로 엽니다"),
         ("데이터 폴더", str(expand(cfg.get("data_dir", "~/OnMoment/morning")))),
     ]
+    cal_cfg = cfg.get("calendar") or {}
+    urls = [u for u in cal_cfg.get("ics_urls") or [] if (u.get("url") if isinstance(u, dict) else u)]
+    if urls:
+        try:
+            cal = collect_calendar(cal_cfg, expand(cfg.get("data_dir", "~/OnMoment/morning")) / "calendar_cache",
+                                   dt.date.today(), log=lambda m: None)
+            rows.append(("구글 캘린더", f"{len(urls)}개 연결 · 오늘 {len(cal['today'])}건 · 7일 {len(cal['week'])}건"
+                                     + (f" · {cal['note']}" if cal["note"] else "")))
+        except Exception as e:
+            rows.append(("구글 캘린더", f"읽기 실패: {e}"))
+    else:
+        rows.append(("구글 캘린더", "연결 안 됨 → config.json 의 calendar.ics_urls 에 비공개 iCal 주소"))
+    keep_dirs = [d for k in ("dirs", "note_dirs") for d in (cfg.get("keep") or {}).get(k) or []]
+    notes = collect_notes(cfg.get("keep") or {}, log=lambda m: None) if keep_dirs else []
+    rows.append(("Keep · 메모", f"{len(notes)}개 읽음 ({', '.join(keep_dirs)})" if keep_dirs else "폴더 없음 → config.json 의 keep.dirs"))
     data_dir = expand(cfg.get("data_dir", "~/OnMoment/morning"))
     lock = data_dir / ".lock"
     if lock.exists():
@@ -734,6 +820,21 @@ def main() -> int:
     stats["messages_claude_ai"] = len(ai_msgs)
     milestones = milestones_with_dday(cfg.get("milestones", []), today)
     radar_state = {"radar": fallback_radar(today)}
+    life = {"cal": {"today": [], "background": [], "week": [], "source": "none", "note": ""}, "notes": [], "plan": None}
+
+    def load_life() -> None:
+        """구글 캘린더 · Keep · 메모를 읽고, 리듬과 캘린더를 합친 오늘의 흐름 초안을 만든다."""
+        try:
+            life["cal"] = collect_calendar(cfg.get("calendar") or {}, data_dir / "calendar_cache", today,
+                                           log=lambda m: log(data_dir, m))
+        except Exception as e:
+            log(data_dir, f"캘린더 읽기 실패: {e}")
+            life["cal"]["note"] = f"캘린더 읽기 실패: {e}"[:200]
+        try:
+            life["notes"] = collect_notes(cfg.get("keep") or {}, log=lambda m: log(data_dir, m))
+        except Exception as e:
+            log(data_dir, f"메모 읽기 실패: {e}")
+        life["plan"] = merge_plan(today_rhythm(cfg, today), life["cal"]["today"])
 
     def finish(brief: dict, source: str, target: Path) -> None:
         brief.setdefault("meta", {})
@@ -742,6 +843,9 @@ def main() -> int:
         brief.update({"date": today.isoformat(), "weekday": WEEKDAYS[today.weekday()], "name": cfg.get("name", "범"),
                       "stats": stats, "milestones": milestones})
         brief.setdefault("radar", radar_state["radar"])
+        cal = life["cal"]
+        brief.setdefault("calendar", {"background": cal["background"], "week": cal["week"][:12],
+                                      "source": cal["source"], "note": cal["note"], "notes_count": len(life["notes"])})
         render(brief, target)
 
     if args.render:
@@ -775,13 +879,14 @@ def main() -> int:
 
     def show_offline(pending: bool, note: str = "") -> dict:
         """창이 절대 빈 대기 화면에 갇히지 않도록, 내장 조언을 먼저 그려 둔다."""
-        brief = offline_brief(today, cfg)
+        brief = offline_brief(today, cfg, life["plan"], life["notes"])
         brief["meta"] = {"pending": pending, "note": note, "timeout": max(timeout, radar_timeout)}
         finish(brief, "offline", window)
         return brief
 
     brief, source, notes = None, "offline", []
     try:
+        load_life()
         if not args.no_open and not args.offline:
             show_offline(pending=True)
             open_window(window, mode)
@@ -821,6 +926,8 @@ def main() -> int:
             milestones=milestones, memory=memory, yesterday_choice=yesterday_choice,
             returns=collect_returns(cfg.get("journal_dirs", [])), stats=stats,
             history=digest_messages(cc_msgs + ai_msgs, hist["max_history_chars"]),
+            calendar=calendar_text(life["cal"], today) if life["cal"]["source"] != "none" else "",
+            plan=life["plan"], notes=notes_text(life["notes"]),
         )
 
         engine = "offline" if args.offline else cfg.get("engine", "auto")
@@ -833,6 +940,7 @@ def main() -> int:
                     brief = parse_brief(run_claude_cli(prompt, cfg.get("claude_cli_model", ""), timeout))
                 elif name == "api":
                     brief = parse_brief(run_api(prompt, cfg.get("api_model", "claude-opus-5")))
+                brief["day_plan"] = ensure_calendar_blocks(list(brief.get("day_plan") or []), life["cal"]["today"])
                 source = name
                 break
             except subprocess.TimeoutExpired:
@@ -845,7 +953,7 @@ def main() -> int:
         if radar_thread is not None:
             radar_thread.join(radar_timeout + 30)
         if brief is None:
-            brief = offline_brief(today, cfg)
+            brief = offline_brief(today, cfg, life["plan"], life["notes"])
             brief["meta"] = {"note": " / ".join(notes)[:400] if notes else ""}
         if source == "offline" and not args.offline:
             # Claude 연결이 안 된 날은 '완성본'으로 저장하지 않아, 다음 실행(로그인 등)에서 다시 시도한다

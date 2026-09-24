@@ -13,6 +13,33 @@
     "region": "경기도 (서울·수도권 우선, 주말은 전국)",
     "help": "매일 아침 Claude가 웹을 검색해 정부지원사업 · AI 교육 · 국내 일정을 찾아옵니다. enabled 를 false 로 하면 끕니다."
   },
+  "calendar": {
+    "ics_urls": [
+      {
+        "name": "개인",
+        "url": ""
+      },
+      {
+        "name": "가족",
+        "url": ""
+      }
+    ],
+    "days_ahead": 7,
+    "timeout_sec": 10
+  },
+  "calendar_help": "구글 캘린더 → 설정 → 왼쪽에서 캘린더 선택 → '캘린더 통합' → '비공개 주소(iCal 형식)'을 복사해 url에 붙여 넣으세요. 이 주소는 비밀번호처럼 다루세요. .ics 파일 경로도 됩니다.",
+  "keep": {
+    "dirs": [
+      "~/Downloads",
+      "~/Downloads/Takeout"
+    ],
+    "note_dirs": [
+      "~/OnMoment/notes"
+    ],
+    "recent_days": 45,
+    "max_notes": 15
+  },
+  "keep_help": "구글 Keep은 개인용 API가 없어, takeout.google.com 에서 'Keep'만 골라 내보낸 뒤 다운로드 폴더에 둔 takeout-*.zip(또는 압축을 푼 Takeout/Keep 폴더)을 읽습니다. 고정한 메모, 최근 45일 안에 고친 메모, 체크 안 된 항목을 봅니다. note_dirs 에는 .md/.txt 메모 폴더(옵시디언 등)를 적습니다.",
   "window_mode": "app",
   "window_mode_help": "app = Edge/Chrome 앱 창(주소창 없는 독립 창)으로 띄움, browser = 기본 브라우저 탭",
   "weekly_rhythm": {
@@ -532,6 +559,12 @@
       "track": "build"
     },
     {
+      "title": "온순간 데이터 연결 · 50명",
+      "date": "2026-09-30",
+      "status": "now",
+      "track": "build"
+    },
+    {
       "title": "변리사 상담 · IP Map (유튜브 공개 전)",
       "date": null,
       "status": "now",
@@ -544,8 +577,8 @@
       "track": "content"
     },
     {
-      "title": "1R 50명 코호트 시작 (Insight 20% 검증)",
-      "date": null,
+      "title": "코호트 베타테스트 50명 · 기관 피칭 준비",
+      "date": "2026-10-15",
       "status": "next",
       "track": "build"
     },

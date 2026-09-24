@@ -149,17 +149,39 @@
   .todo li.checked label { background: var(--surface-2); }
   .todo li.checked .t span:first-child { text-decoration: line-through; color: var(--muted); }
 
+  .brief-list { list-style: none; margin: 0 0 4px; padding: 0; display: grid; gap: 7px; }
+  .brief-list li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; font-size: 15.5px; line-height: 1.55; }
+  .brief-list li::before { content: "▸"; color: var(--amber); font-size: 13px; padding-top: 2px; }
+  .bg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 4px; }
+  .bg-chip { display: inline-flex; gap: 6px; align-items: baseline; font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+  .bg-chip .num { color: var(--amber); font-size: 12px; }
+  .sub-h { font-size: 13px; font-weight: 600; color: var(--muted); margin: 18px 0 6px; letter-spacing: .02em; }
+  .keep { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .keep li { border-left: 3px solid #e3b341; background: var(--surface-2); border-radius: 0 10px 10px 0; padding: 8px 12px; font-size: 14.5px; }
+  .keep li small { display: block; color: var(--muted); font-size: 12.5px; }
+
   /* ---------- 3. flow + gates ---------- */
   .plan { list-style: none; margin: 0; padding: 0; display: grid; }
-  .plan li { display: grid; grid-template-columns: 96px 18px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
-  .plan li:first-child { border-top: 0; }
+  .plan > li { display: grid; grid-template-columns: 96px 18px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
+  .plan > li:first-child { border-top: 0; }
   .plan .tm { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
   .plan input { width: 17px; height: 17px; margin-top: 4px; accent-color: var(--amber); }
   .plan .ttl { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
   .plan .det { color: var(--ink-2); font-size: 14.5px; }
-  .plan li.is-now { background: var(--amber-soft); border-radius: 10px; padding-inline: 10px; margin-inline: -10px; border-top-color: transparent; }
-  .plan li.is-now + li { border-top-color: transparent; }
-  .plan li.checked .ttl span:first-child, .plan li.checked .det { text-decoration: line-through; color: var(--muted); }
+  .plan > li.is-now { background: var(--amber-soft); border-radius: 10px; padding-inline: 10px; margin-inline: -10px; border-top-color: transparent; }
+  .plan > li.is-now + li { border-top-color: transparent; }
+  .plan > li.checked .ttl span:first-child, .plan > li.checked .det { text-decoration: line-through; color: var(--muted); }
+  .plan > li[data-src="calendar"] .tm { color: var(--build); font-weight: 500; }
+  .cal-badge { font-family: var(--mono); font-size: 10.5px; padding: 1px 7px; border-radius: 4px; background: var(--build); color: var(--surface); letter-spacing: .03em; }
+  .coach { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 1px; font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+  .coach b { font-weight: 600; color: var(--muted); margin-right: 4px; }
+  .plan > li.is-now .coach { color: var(--ink); }
+  .overlap { font-size: 12.5px; color: var(--content); }
+  .week { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .week .day { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .week .day:first-child { margin-top: 0; }
+  .week .ev { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; font-size: 14px; line-height: 1.5; }
+  .week .ev .num { color: var(--muted); font-size: 12.5px; padding-top: 1px; }
   .gates { list-style: none; margin: 0; padding: 0; display: grid; }
   .gates li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 8px 0; position: relative; }
   .gates li::before { content: ""; position: absolute; left: 6px; top: 24px; bottom: -8px; width: 2px; background: var(--line); }
@@ -197,11 +219,14 @@
   .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--amber); font-weight: 600; }
   .chapter h3.ch-title { font-family: var(--serif); font-weight: 500; font-size: clamp(21px, 2.6vw, 27px); line-height: 1.4; margin-bottom: 14px; }
   .evidence { margin: 0 0 20px; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; font-size: 13.5px; color: var(--ink-2); }
-  .prose { max-width: 68ch; font-size: 16.5px; line-height: 1.85; }
+  .prose { max-width: 72ch; font-size: 16px; line-height: 1.7; }
   .prose p { margin: 0 0 1em; }
-  .prose h3 { font-family: var(--serif); font-weight: 700; font-size: 18px; margin: 1.5em 0 0.5em; }
-  .prose ul, .prose ol { margin: 0 0 1em; padding-left: 1.3em; }
-  .prose li { margin: 0.3em 0; }
+  .prose h3 { font-family: var(--serif); font-weight: 700; font-size: 17.5px; margin: 1.4em 0 0.45em; padding-left: 10px; border-left: 3px solid var(--amber); line-height: 1.4; }
+  .prose h3:first-child { margin-top: 0; }
+  .prose ul, .prose ol { margin: 0 0 0.6em; padding-left: 1.2em; }
+  .prose ul ul { margin: 2px 0 2px; color: var(--ink-2); font-size: 15px; }
+  .prose li { margin: 0.18em 0; }
+  .prose li::marker { color: var(--muted); }
   .prose blockquote { margin: 1.2em 0; padding: 2px 0 2px 16px; border-left: 2px solid var(--amber); font-family: var(--serif); font-size: 17.5px; }
   .prose strong { font-weight: 600; background: linear-gradient(transparent 62%, var(--amber-soft) 62%); }
   .prose code { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); border: 1px solid var(--line); padding: 0 5px; border-radius: 5px; }
@@ -215,6 +240,7 @@
   .tip { border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; align-content: start; }
   .tip b { font-size: 15.5px; }
   .tip p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .tip ol { margin: 0; padding-left: 1.2em; font-size: 14px; color: var(--ink-2); }
   .prompt-box { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; margin: 0; }
   .copy { justify-self: start; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 3px 12px; font-size: 13px; color: var(--ink-2); }
   .shots { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
@@ -245,7 +271,7 @@
     body { font-size: 15.5px; }
     .sky { padding: 20px 18px 6px; }
     .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .plan li { grid-template-columns: 74px 18px minmax(0, 1fr); gap: 8px; }
+    .plan > li { grid-template-columns: 74px 18px minmax(0, 1fr); gap: 8px; }
     .line3 { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   }
 </style>
@@ -264,7 +290,10 @@
 
   <section class="row-2" aria-label="오늘">
     <article class="panel">
-      <div class="section-head"><h2>오늘의 3줄</h2><span class="label">고쳐 쓰면 저장됩니다</span></div>
+      <div class="section-head"><h2>오늘 브리핑</h2><span class="label" id="calMeta"></span></div>
+      <ul class="brief-list" id="briefing"></ul>
+      <div class="bg-chips" id="bgChips"></div>
+      <div class="sub-h">오늘의 3줄 · 고쳐 쓰면 저장</div>
       <div class="line3" data-k="reality"><span class="k">현재</span><div class="v" id="l-reality" contenteditable="true" spellcheck="false"></div></div>
       <div class="line3" data-k="wish"><span class="k">바람</span><div class="v" id="l-wish" contenteditable="true" spellcheck="false"></div></div>
       <div class="line3" data-k="choice"><span class="k">선택</span><div class="v" id="l-choice" contenteditable="true" spellcheck="false"></div></div>
@@ -273,16 +302,19 @@
     <article class="panel">
       <div class="section-head"><h2>오늘 꼭 할 3가지</h2><span class="label num" id="todoCount"></span></div>
       <ul class="todo" id="todo"></ul>
+      <div id="keepBox" hidden><div class="sub-h">Keep · 메모에서 꺼낸 것</div><ul class="keep" id="keep"></ul></div>
     </article>
   </section>
 
   <section class="row-2">
     <div class="panel">
-      <div class="section-head"><h2>오늘의 흐름</h2><span class="label num" id="planCount"></span></div>
+      <div class="section-head"><h2>오늘의 흐름 · 코칭</h2><span class="label num" id="planCount"></span></div>
       <ol class="plan" id="plan"></ol>
     </div>
     <div class="panel">
-      <div class="section-head"><h2>게이트</h2><span class="label">모두의창업 · Creator OS</span></div>
+      <div class="section-head"><h2>앞으로 7일</h2><span class="label">구글 캘린더</span></div>
+      <ul class="week" id="week"></ul>
+      <div class="section-head" style="margin-top:26px"><h2>게이트</h2><span class="label">모두의창업 · Creator OS</span></div>
       <ul class="gates" id="gates"></ul>
     </div>
   </section>
@@ -393,6 +425,24 @@ const BRIEF = "__BRIEF_DATA__";
     `최근 7일 Claude 대화 <b class="num">${(D.stats?.messages_recent ?? 0).toLocaleString()}</b>개를 읽음`,
     src ? `생성 · ${esc(src)}` : ""].filter(Boolean).map((s) => `<span>${s}</span>`).join("");
 
+  // ---------- 2. briefing · calendar background · keep
+  const CAL = D.calendar || {};
+  const wd = (s) => "일월화수목금토"[new Date(s + "T00:00:00").getDay()];
+  $("briefing").innerHTML = (D.briefing || []).map((x) => `<li><span>${esc(x)}</span></li>`).join("");
+  $("briefing").hidden = !(D.briefing || []).length;
+  $("bgChips").innerHTML = (CAL.background || []).map((e) => { const n = daysTo(e.last);
+    return `<span class="bg-chip"><span>${esc(e.title)}</span>${e.last !== e.date ? `<span class="num">~${md(0, e.last)}${n != null && n >= 0 ? " · D-" + n : ""}</span>` : ""}</span>`; }).join("");
+  $("calMeta").textContent = CAL.source === "live" ? "캘린더 연결됨" : CAL.source === "cache" ? "캘린더 · 지난번 기록" : CAL.source === "sample" ? "캘린더 · 샘플" : "캘린더 연결 전";
+  if (CAL.note) $("calMeta").title = CAL.note;
+  const weekEv = CAL.week || [];
+  let lastDay = "";
+  $("week").innerHTML = weekEv.map((e) => { const head = e.date !== lastDay ? `<li class="day">${md(0, e.date)} (${wd(e.date)}) · D-${daysTo(e.date)}</li>` : ""; lastDay = e.date;
+    return head + `<li class="ev"><span class="num">${e.all_day ? "종일" : esc(e.start)}</span><span>${esc(e.title)}${e.all_day && e.last !== e.date ? ` <span class="num">~${md(0, e.last)}</span>` : ""}</span></li>`; }).join("")
+    || `<li class="ev"><span></span><span class="org" style="color:var(--muted);font-size:13.5px">config.json 의 calendar.ics_urls 에 구글 캘린더 비공개 주소를 넣으면 여기 보입니다.</span></li>`;
+  const keep = D.keep_picks || [];
+  $("keepBox").hidden = !keep.length;
+  $("keep").innerHTML = keep.map((k) => `<li>${esc(k.item)}<small>${esc(k.note || "")}${k.when ? " → " + esc(k.when) : ""}</small></li>`).join("");
+
   // ---------- 2. today: 3 lines + top3
   ["reality", "wish", "choice"].forEach((k) => {
     const el = $("l-" + k); el.textContent = store.get("3-" + k, D.three_lines?.[k] || "");
@@ -416,10 +466,11 @@ const BRIEF = "__BRIEF_DATA__";
   $("plan").innerHTML = plan.map((b, i) => {
     const s = toMin(b.time), e = toMin(b.end);
     const live = isToday && s != null && nowMin >= s && nowMin < (e ?? s + 60);
-    return `<li class="${live ? "is-now" : ""}${planDone[i] ? " checked" : ""}" data-i="${i}">
+    const coach = (b.coach || []).map((c) => { const m = /^(.{1,4}?)\s*·\s*(.*)$/.exec(c); return `<li>${m ? `<b>${esc(m[1])}</b>${esc(m[2])}` : esc(c)}</li>`; }).join("");
+    return `<li class="${live ? "is-now" : ""}${planDone[i] ? " checked" : ""}" data-i="${i}" data-src="${esc(b.source || "rhythm")}">
       <span class="tm">${esc(b.time)}${b.end ? "–" + esc(b.end) : ""}</span>
       <input type="checkbox" id="plan-${i}" ${planDone[i] ? "checked" : ""} aria-label="${esc(b.title)} 완료">
-      <div><div class="ttl"><span>${esc(b.title)}</span><span class="chip tag-${tagOf(b.tag)}">${TAGS[tagOf(b.tag)]}</span></div>${b.detail ? `<div class="det">${esc(b.detail)}</div>` : ""}</div></li>`;
+      <div><div class="ttl"><span>${esc(b.title)}</span>${b.source === "calendar" ? `<span class="cal-badge">캘린더</span>` : ""}<span class="chip tag-${tagOf(b.tag)}">${TAGS[tagOf(b.tag)]}</span></div>${b.detail ? `<div class="det">${esc(b.detail)}</div>` : ""}${b.overlap && !b.detail ? `<div class="overlap">겹침 · ${esc(b.overlap)}</div>` : ""}${coach ? `<ul class="coach">${coach}</ul>` : ""}</div></li>`;
   }).join("");
   $("plan").addEventListener("change", (ev) => { const li = ev.target.closest("li"); const i = +li.dataset.i; planDone[i] = ev.target.checked; li.classList.toggle("checked", ev.target.checked); store.set("plan", planDone); renderPlanCount(); });
   renderPlanCount();
@@ -455,16 +506,19 @@ const BRIEF = "__BRIEF_DATA__";
   // ---------- 5. advice tabs
   function mdToHtml(src) {
     const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
-    let html = "", list = null, para = [];
+    let html = "", list = null, para = [], sub = false;
     const endPara = () => { if (para.length) { html += `<p>${inline(para.join(" "))}</p>`; para = []; } };
-    const endList = () => { if (list) { html += `</${list}>`; list = null; } };
+    const endSub = () => { if (sub) { html += "</ul></li>"; sub = false; } };
+    const endList = () => { endSub(); if (list) { html += `</${list}>`; list = null; } };
     for (const raw of String(src || "").split(/\r?\n/)) {
       const l = raw.trim(); let m;
+      const indent = raw.length - raw.trimStart().length;
       if (!l) { endPara(); endList(); }
       else if ((m = /^#{2,4}\s+(.*)/.exec(l))) { endPara(); endList(); html += `<h3>${inline(m[1])}</h3>`; }
       else if ((m = /^>\s?(.*)/.exec(l))) { endPara(); endList(); html += `<blockquote>${inline(m[1])}</blockquote>`; }
-      else if ((m = /^[-*]\s+(.*)/.exec(l))) { endPara(); if (list !== "ul") { endList(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
-      else if ((m = /^\d+[.)]\s+(.*)/.exec(l))) { endPara(); if (list !== "ol") { endList(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = /^[-*]\s+(.*)/.exec(l)) && indent >= 2 && list) { endPara(); if (!sub) { html = html.replace(/<\/li>$/, "") + "<ul>"; sub = true; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = /^[-*]\s+(.*)/.exec(l))) { endPara(); endSub(); if (list !== "ul") { endList(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = /^\d+[.)]\s+(.*)/.exec(l))) { endPara(); endSub(); if (list !== "ol") { endList(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
       else { endList(); para.push(l); }
     }
     endPara(); endList(); return html;
@@ -481,7 +535,7 @@ const BRIEF = "__BRIEF_DATA__";
         ${cm.episode_seed ? `<h4>이번 주 에피소드 씨앗</h4><p class="plain" style="padding:0">${esc(cm.episode_seed)}</p>` : ""}</div>`;
     }
     if (id === "claude" && (D.claude_code || []).length) {
-      return `<div class="extra"><h4>복사해서 바로 쓰는 프롬프트</h4><div class="tips">${D.claude_code.map((t, i) => `<div class="tip"><b>${esc(t.title)}</b><p>${esc(t.why)}</p><p>${esc(t.how)}</p>
+      return `<div class="extra"><h4>복사해서 바로 쓰는 프롬프트</h4><div class="tips">${D.claude_code.map((t, i) => `<div class="tip"><b>${esc(t.title)}</b><p>${esc(t.why)}</p>${Array.isArray(t.how) ? `<ol>${t.how.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>` : `<p>${esc(t.how)}</p>`}
         ${t.prompt ? `<pre class="prompt-box" id="pr-${i}">${esc(t.prompt)}</pre><button class="copy" type="button" data-copy="${i}">프롬프트 복사</button>` : ""}</div>`).join("")}</div></div>`;
     }
     if (id === "rhythm" && (D.watchouts || []).length) {
